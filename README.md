@@ -185,4 +185,4 @@ GET /analysis
 
 ## 👤 作者
 
-- GitHub: [@yourusername](https://github.com/yourusername)
+- GitHub: [@ks0227](https://github.com/ks0227)
