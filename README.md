@@ -72,7 +72,7 @@ Webアプリとして実際に使える形に仕上げました。
 ### 1. リポジトリをクローン
 
 ```bash
-git clone https://github.com/yourusername/health-weather-app.git
+git clone https://github.com/ks0227/health-weather-app.git
 cd health-weather-app
 ```
 
