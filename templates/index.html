@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>体調 × 天気 分析システム</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: sans-serif;
+        background: #f5f5f5;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        color: #333;
+      }
+
+      .hero {
+        text-align: center;
+        margin-bottom: 48px;
+      }
+      .hero .icon {
+        font-size: 52px;
+        margin-bottom: 16px;
+      }
+      .hero h1 {
+        font-size: 26px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+      .hero p {
+        color: #888;
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        width: 100%;
+        max-width: 640px;
+        margin-bottom: 40px;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 28px 20px;
+        text-align: center;
+        text-decoration: none;
+        color: #333;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s;
+        border: 1.5px solid transparent;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        border-color: #1d9e75;
+      }
+      .card .card-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+      }
+      .card h2 {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .card p {
+        font-size: 12px;
+        color: #999;
+        line-height: 1.6;
+      }
+
+      .footer {
+        font-size: 12px;
+        color: #bbb;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="hero">
+      <div class="icon">🌤️</div>
+      <h1>体調 × 天気 分析システム</h1>
+      <p>
+        毎日の体調を記録して、天気との関係を可視化します。<br />気圧・気温・湿度があなたの体調に与える影響を発見しましょう。
+      </p>
+    </div>
+
+    <div class="cards">
+      <a href="/log" class="card">
+        <div class="card-icon">📝</div>
+        <h2>体調を記録する</h2>
+        <p>気分・睡眠・症状を<br />今日のデータとして登録</p>
+      </a>
+
+      <a href="/dashboard" class="card">
+        <div class="card-icon">📊</div>
+        <h2>ダッシュボード</h2>
+        <p>相関分析・トレンド<br />グラフを確認する</p>
+      </a>
+
+      <a href="/health" class="card">
+        <div class="card-icon">📋</div>
+        <h2>記録一覧</h2>
+        <p>これまでの体調ログを<br />一覧で確認する</p>
+      </a>
+    </div>
+
+    <div class="footer">
+      体調データは毎日記録するほど分析精度が上がります。<br />
+      30日分以上の記録がたまると相関が見えてきます。
+    </div>
+  </body>
+</html>

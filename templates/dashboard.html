@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>体調×天気 ダッシュボード</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+        color: #333;
+      }
+      h1 {
+        font-size: 22px;
+        margin-bottom: 4px;
+      }
+      .subtitle {
+        color: #888;
+        font-size: 13px;
+        margin-bottom: 24px;
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+        margin-bottom: 32px;
+      }
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      }
+      .card h2 {
+        font-size: 14px;
+        color: #888;
+        margin: 0 0 8px;
+      }
+      .card .value {
+        font-size: 28px;
+        font-weight: 500;
+      }
+      .card .desc {
+        font-size: 12px;
+        color: #aaa;
+        margin-top: 4px;
+      }
+      .chart-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        margin-bottom: 24px;
+      }
+      .chart-card h2 {
+        font-size: 16px;
+        margin: 0 0 16px;
+      }
+      .corr-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+      }
+      .corr-item {
+        border-radius: 8px;
+        padding: 14px 16px;
+        font-size: 13px;
+      }
+      .corr-item .label {
+        color: #888;
+        margin-bottom: 4px;
+      }
+      .corr-item .r-value {
+        font-size: 22px;
+        font-weight: 500;
+      }
+      .corr-item .summary {
+        font-size: 11px;
+        margin-top: 6px;
+      }
+      .positive {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      .negative {
+        background: #fce4ec;
+        color: #c62828;
+      }
+      .neutral {
+        background: #f5f5f5;
+        color: #777;
+      }
+      .error-box {
+        background: #fff3e0;
+        border-radius: 12px;
+        padding: 24px;
+        color: #e65100;
+        font-size: 14px;
+      }
+      .badge {
+        display: inline-block;
+        font-size: 10px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        margin-left: 6px;
+        vertical-align: middle;
+        font-weight: normal;
+      }
+      .badge-significant {
+        background: #c8e6c9;
+        color: #1b5e20;
+      }
+      .badge-marginal {
+        background: #fff9c4;
+        color: #f57f17;
+      }
+      .badge-none {
+        background: #eeeeee;
+        color: #9e9e9e;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>体調 × 天気 ダッシュボード</h1>
+    <p class="subtitle">個人生活データ分析システム</p>
+
+    {% if result.get("error") %}
+    <div class="error-box">⚠️ {{ result.error }}</div>
+
+    {% else %}
+
+    <!-- サマリーカード -->
+    <div class="cards">
+      <div class="card">
+        <h2>分析データ数</h2>
+        <div class="value">{{ result.data_count }} 日</div>
+        <div class="desc">体調×天気が一致した日数</div>
+      </div>
+      <div class="card">
+        <h2>直近の気分スコア</h2>
+        <div class="value">{{ result.trend[-1].mood_score }} / 5</div>
+        <div class="desc">最新の記録</div>
+      </div>
+      <div class="card">
+        <h2>直近の気圧</h2>
+        <div class="value">{{ result.trend[-1].pressure }} hPa</div>
+        <div class="desc">最新の記録</div>
+      </div>
+    </div>
+
+    <!-- トレンドグラフ -->
+    <div class="chart-card">
+      <h2>気分スコアと気圧のトレンド（7日移動平均）</h2>
+      <div id="trend-chart"></div>
+    </div>
+
+    <!-- 相関ヒートマップ -->
+    <div class="chart-card">
+      <h2>相関分析ヒートマップ</h2>
+      <div id="heatmap-chart"></div>
+    </div>
+
+    <!-- 相関サマリー -->
+    <div class="chart-card">
+      <h2>気分スコアと天気の関係</h2>
+      <div class="corr-grid">
+        {% for item in result.correlations if item.health == "mood_score" %} {%
+        set cls = "positive" if item.r > 0.1 else ("negative" if item.r < -0.1
+        else "neutral") %}
+        <div class="corr-item {{ cls }}">
+          <div class="label">
+            {{ {"temperature": "気温", "humidity": "湿度", "pressure":
+            "気圧"}[item.weather] }} {% if item.significant_05 %}
+            <span class="badge badge-significant">統計的に有意 ✓</span>
+            {% elif item.significant_10 %}
+            <span class="badge badge-marginal">参考値</span>
+            {% else %}
+            <span class="badge badge-none">データ不足</span>
+            {% endif %}
+          </div>
+          <div class="r-value">r = {{ item.r }}</div>
+          <div class="summary">{{ item.summary }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <script>
+      const trend = {{ result.trend | tojson }};
+
+      // トレンドグラフ
+      Plotly.newPlot("trend-chart", [
+        {
+          x: trend.map(d => d.date),
+          y: trend.map(d => d.mood_7d),
+          name: "気分スコア（7日平均）",
+          type: "scatter",
+          mode: "lines+markers",
+          line: { color: "#1d9e75", width: 2 },
+          yaxis: "y1",
+        },
+        {
+          x: trend.map(d => d.date),
+          y: trend.map(d => d.pressure_7d),
+          name: "気圧（7日平均）",
+          type: "scatter",
+          mode: "lines",
+          line: { color: "#378add", width: 2, dash: "dot" },
+          yaxis: "y2",
+        }
+      ], {
+        margin: { t: 10, r: 60, b: 40, l: 50 },
+        legend: { orientation: "h", y: -0.2 },
+        yaxis:  { title: "気分スコア", range: [0, 5.5] },
+        yaxis2: { title: "気圧 (hPa)", overlaying: "y", side: "right" },
+        plot_bgcolor:  "#fff",
+        paper_bgcolor: "#fff",
+      });
+
+        const corrList = {{ result.correlations | tojson }};
+
+        const labelMap = {
+          mood_score:  "気分スコア",
+          sleep_hours: "睡眠時間",
+          temperature: "気温",
+          humidity:    "湿度",
+          pressure:    "気圧"
+        };
+
+        const healthLabels  = [...new Set(corrList.map(d => d.health))];
+        const weatherLabels = [...new Set(corrList.map(d => d.weather))];
+
+        const zValues = healthLabels.map(h =>
+          weatherLabels.map(w => {
+            const item = corrList.find(d => d.health === h && d.weather === w);
+            return item ? item.r : null;
+          })
+        );
+
+        Plotly.newPlot("heatmap-chart", [{
+          type:         "heatmap",
+          z:            zValues,
+          x:            weatherLabels.map(w => labelMap[w] || w),
+          y:            healthLabels.map(h => labelMap[h] || h),
+          colorscale: [
+            [0,   "#c62828"],
+            [0.5, "#f5f5f5"],
+            [1,   "#2e7d32"]
+          ],
+          zmin:         -1,
+          zmax:          1,
+          text:         zValues.map(row => row.map(v => v !== null ? v.toFixed(2) : "N/A")),
+          texttemplate: "%{text}",
+          showscale:    true,
+        }], {
+          margin:        { t: 10, r: 20, b: 60, l: 80 },
+          plot_bgcolor:  "#fff",
+          paper_bgcolor: "#fff",
+        });
+    </script>
+    {% endif %}
+  </body>
+</html>

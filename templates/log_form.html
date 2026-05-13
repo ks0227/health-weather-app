@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>体調を記録する</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+        color: #333;
+      }
+      .container {
+        max-width: 480px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 22px;
+        margin-bottom: 4px;
+      }
+      .subtitle {
+        color: #888;
+        font-size: 13px;
+        margin-bottom: 32px;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 28px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        margin-bottom: 16px;
+      }
+      .field {
+        margin-bottom: 24px;
+      }
+      label {
+        display: block;
+        font-size: 13px;
+        color: #888;
+        margin-bottom: 8px;
+      }
+      .required {
+        color: #e53935;
+        margin-left: 4px;
+      }
+
+      /* 気分スコア */
+      .mood-group {
+        display: flex;
+        gap: 10px;
+      }
+      .mood-group input[type="radio"] {
+        display: none;
+      }
+      .mood-group label {
+        flex: 1;
+        text-align: center;
+        padding: 12px 0;
+        border-radius: 8px;
+        border: 1.5px solid #e0e0e0;
+        cursor: pointer;
+        font-size: 22px;
+        margin: 0;
+        transition: all 0.15s;
+      }
+      .mood-group input[type="radio"]:checked + label {
+        border-color: #1d9e75;
+        background: #e8f5e9;
+      }
+
+      input[type="number"],
+      input[type="date"],
+      input[type="text"],
+      textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1.5px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 15px;
+        box-sizing: border-box;
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      input:focus,
+      textarea:focus {
+        border-color: #1d9e75;
+      }
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .btn-submit {
+        width: 100%;
+        padding: 14px;
+        background: #1d9e75;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .btn-submit:hover {
+        background: #0f6e56;
+      }
+
+      .nav {
+        text-align: center;
+        margin-top: 16px;
+        font-size: 13px;
+        color: #888;
+      }
+      .nav a {
+        color: #1d9e75;
+        text-decoration: none;
+      }
+
+      /* 完了メッセージ */
+      .flash {
+        background: #e8f5e9;
+        border-radius: 10px;
+        padding: 16px 20px;
+        color: #2e7d32;
+        font-size: 14px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .flash-error {
+        background: #fce4ec;
+        color: #c62828;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>体調を記録する</h1>
+      <p class="subtitle">
+        今日の体調を入力してください。天気は自動で取得されます。
+      </p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %} {% for
+      category, message in messages %}
+      <div class="flash {% if category == 'error' %}flash-error{% endif %}">
+        {{ "✓" if category != "error" else "⚠️" }} {{ message }}
+      </div>
+      {% endfor %} {% endwith %}
+
+      <div class="card">
+        <form method="POST" action="/log">
+          <!-- 日付 -->
+          <div class="field">
+            <label>日付 <span class="required">*</span></label>
+            <input type="date" name="date" required value="{{ today }}" />
+          </div>
+
+          <!-- 気分スコア -->
+          <div class="field">
+            <label>気分スコア <span class="required">*</span></label>
+            <div class="mood-group">
+              {% for val, emoji in
+              [(1,"😞"),(2,"😕"),(3,"😐"),(4,"🙂"),(5,"😄")] %}
+              <input
+                type="radio"
+                name="mood_score"
+                id="mood{{ val }}"
+                value="{{ val }}"
+                required
+              />
+              <label for="mood{{ val }}">{{ emoji }}</label>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- 睡眠時間 -->
+          <div class="field">
+            <label>睡眠時間（時間）</label>
+            <input
+              type="number"
+              name="sleep_hours"
+              min="0"
+              max="24"
+              step="0.5"
+              placeholder="例: 7.5"
+            />
+          </div>
+
+          <!-- 症状 -->
+          <div class="field">
+            <label>症状・体調メモ</label>
+            <input
+              type="text"
+              name="symptom"
+              placeholder="例: 頭痛、倦怠感、肩こり"
+            />
+          </div>
+
+          <!-- メモ -->
+          <div class="field">
+            <label>自由メモ</label>
+            <textarea
+              name="note"
+              placeholder="気になったことを自由に書いてください"
+            ></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit">記録する</button>
+        </form>
+      </div>
+
+      <div class="nav">
+        <a href="/dashboard">ダッシュボードを見る</a>
+      </div>
+    </div>
+  </body>
+</html>
