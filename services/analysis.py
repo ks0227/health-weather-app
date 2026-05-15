@@ -55,7 +55,7 @@ def prepare_dataset(df_health, df_weather):
 # Analysis Layer
 # =========================
 def compute_correlations(df):
-    health_cols = ["mood_score", "sleep_hours"]
+    health_cols  = ["mood_score", "sleep_hours"]
     weather_cols = ["temperature", "humidity", "pressure"]
 
     results = []
@@ -63,21 +63,36 @@ def compute_correlations(df):
     for hc in health_cols:
         for wc in weather_cols:
 
+            # 定数チェック（値が全て同じ場合はスキップ）
+            if df[hc].nunique() < 2 or df[wc].nunique() < 2:
+                results.append({
+                    "health":          hc,
+                    "weather":         wc,
+                    "r":               0.0,
+                    "p":               1.0,
+                    "significant_05":  False,
+                    "significant_10":  False,
+                    "strength":        "weak",
+                    "direction":       "positive",
+                    "summary":         "データのばらつきが不足しています"
+                })
+                continue
+
             r, p = stats.spearmanr(df[hc], df[wc])
 
             if pd.isna(r) or pd.isna(p):
                 continue
 
             results.append({
-                "health": hc,
-                "weather": wc,
-                "r": round(float(r), 3),
-                "p": round(float(p), 4),
-                "significant_05": bool(p < 0.05),
-                "significant_10": bool(p < 0.1),
-                "strength": classify_strength(r),
-                "direction": "positive" if r > 0 else "negative",
-                "summary": summarize(hc, wc, r, p)
+                "health":          hc,
+                "weather":         wc,
+                "r":               round(float(r), 3),
+                "p":               round(float(p), 4),
+                "significant_05":  bool(p < 0.05),
+                "significant_10":  bool(p < 0.1),
+                "strength":        classify_strength(r),
+                "direction":       "positive" if r > 0 else "negative",
+                "summary":         summarize(hc, wc, r, p)
             })
 
     return results
