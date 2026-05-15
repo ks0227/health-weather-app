@@ -236,7 +236,8 @@
         const zValues = healthLabels.map(h =>
           weatherLabels.map(w => {
             const item = corrList.find(d => d.health === h && d.weather === w);
-            return item ? item.r : null;
+            const val = item ? item.r : null;
+            return (val === null || isNaN(val)) ? 0 : val;
           })
         );
 
