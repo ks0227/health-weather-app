@@ -100,6 +100,9 @@ def compute_trend(df):
         .round(2)
     )
 
+    # NaN を None に変換（JSON対応）
+    df = df.where(pd.notnull(df), other=None)
+
     return df[[
         "date",
         "mood_score",
