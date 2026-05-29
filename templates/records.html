@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>記録管理</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: sans-serif;
+        background: #f5f5f5;
+        padding: 24px;
+        color: #333;
+      }
+      h1 {
+        font-size: 22px;
+        margin-bottom: 4px;
+      }
+      .subtitle {
+        color: #888;
+        font-size: 13px;
+        margin-bottom: 24px;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        margin-bottom: 24px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      th {
+        text-align: left;
+        padding: 10px 12px;
+        background: #f5f5f5;
+        color: #888;
+        font-weight: 500;
+        border-bottom: 1px solid #e0e0e0;
+      }
+      td {
+        padding: 12px;
+        border-bottom: 1px solid #f0f0f0;
+        vertical-align: middle;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: #fafafa;
+      }
+
+      .mood {
+        display: inline-block;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 28px;
+        font-size: 16px;
+      }
+
+      .btn {
+        padding: 6px 14px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .btn-edit {
+        background: #e3f2fd;
+        color: #1565c0;
+        margin-right: 6px;
+      }
+      .btn-edit:hover {
+        background: #bbdefb;
+      }
+      .btn-delete {
+        background: #fce4ec;
+        color: #c62828;
+      }
+      .btn-delete:hover {
+        background: #f8bbd0;
+      }
+
+      .flash {
+        background: #e8f5e9;
+        border-radius: 10px;
+        padding: 14px 20px;
+        color: #2e7d32;
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+      .flash-error {
+        background: #fce4ec;
+        color: #c62828;
+      }
+
+      /* 編集モーダル */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-overlay.active {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border-radius: 14px;
+        padding: 28px;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+      }
+      .modal h2 {
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+      .field {
+        margin-bottom: 16px;
+      }
+      .field label {
+        display: block;
+        font-size: 12px;
+        color: #888;
+        margin-bottom: 6px;
+      }
+      .field input,
+      .field textarea {
+        width: 100%;
+        padding: 9px 12px;
+        border: 1.5px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+      }
+      .field input:focus,
+      .field textarea:focus {
+        border-color: #1d9e75;
+      }
+      .field textarea {
+        resize: vertical;
+        min-height: 70px;
+      }
+
+      .mood-group {
+        display: flex;
+        gap: 8px;
+      }
+      .mood-group input[type="radio"] {
+        display: none;
+      }
+      .mood-group label {
+        flex: 1;
+        text-align: center;
+        padding: 10px 0;
+        border-radius: 8px;
+        border: 1.5px solid #e0e0e0;
+        cursor: pointer;
+        font-size: 20px;
+      }
+      .mood-group input[type="radio"]:checked + label {
+        border-color: #1d9e75;
+        background: #e8f5e9;
+      }
+
+      .modal-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .btn-save {
+        flex: 1;
+        padding: 12px;
+        background: #1d9e75;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .btn-save:hover {
+        background: #0f6e56;
+      }
+      .btn-cancel {
+        flex: 1;
+        padding: 12px;
+        background: #f5f5f5;
+        color: #666;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .nav {
+        margin-bottom: 20px;
+      }
+      .nav a {
+        color: #1d9e75;
+        text-decoration: none;
+        font-size: 13px;
+      }
+      .empty {
+        text-align: center;
+        color: #aaa;
+        padding: 40px;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="nav"><a href="/">← トップに戻る</a></div>
+    <h1>記録管理</h1>
+    <p class="subtitle">体調ログの確認・編集・削除ができます</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %} {% for
+    category, message in messages %}
+    <div class="flash {% if category == 'error' %}flash-error{% endif %}">
+      {{ "✓" if category != "error" else "⚠️" }} {{ message }}
+    </div>
+    {% endfor %} {% endwith %}
+
+    <div class="card">
+      {% if logs %}
+      <table>
+        <thead>
+          <tr>
+            <th>日付</th>
+            <th>気分</th>
+            <th>睡眠</th>
+            <th>症状</th>
+            <th>メモ</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in logs %}
+          <tr>
+            <td>{{ log.date }}</td>
+            <td>
+              <span class="mood">
+                {{ ["😞","😕","😐","🙂","😄"][log.mood_score - 1] }}
+              </span>
+            </td>
+            <td>{{ log.sleep_hours or "−" }}h</td>
+            <td>{{ log.symptom or "−" }}</td>
+            <td>{{ log.note or "−" }}</td>
+            <td>
+              <button
+                class="btn btn-edit"
+                onclick="openEdit(
+                {{ log.id }},
+                '{{ log.date }}',
+                {{ log.mood_score }},
+                '{{ log.sleep_hours or '' }}',
+                '{{ log.symptom or '' }}',
+                '{{ log.note or '' }}'
+              )"
+              >
+                編集
+              </button>
+              <form
+                method="POST"
+                action="/records/{{ log.id }}/delete"
+                style="display: inline"
+                onsubmit="return confirm('削除しますか？');"
+              >
+                <button type="submit" class="btn btn-delete">削除</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">
+        記録がまだありません。<br /><a href="/log">体調を記録する</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- 編集モーダル -->
+    <div class="modal-overlay" id="modal">
+      <div class="modal">
+        <h2>記録を編集する</h2>
+        <form method="POST" id="edit-form" action="">
+          <div class="field">
+            <label>日付</label>
+            <input type="date" name="date" id="edit-date" required />
+          </div>
+
+          <div class="field">
+            <label>気分スコア</label>
+            <div class="mood-group">
+              {% for val, emoji in
+              [(1,"😞"),(2,"😕"),(3,"😐"),(4,"🙂"),(5,"😄")] %}
+              <input
+                type="radio"
+                name="mood_score"
+                id="edit-mood{{ val }}"
+                value="{{ val }}"
+              />
+              <label for="edit-mood{{ val }}">{{ emoji }}</label>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="field">
+            <label>睡眠時間（時間）</label>
+            <input
+              type="number"
+              name="sleep_hours"
+              id="edit-sleep"
+              min="0"
+              max="24"
+              step="0.5"
+            />
+          </div>
+
+          <div class="field">
+            <label>症状</label>
+            <input type="text" name="symptom" id="edit-symptom" />
+          </div>
+
+          <div class="field">
+            <label>メモ</label>
+            <textarea name="note" id="edit-note"></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button type="submit" class="btn-save">保存する</button>
+            <button type="button" class="btn-cancel" onclick="closeModal()">
+              キャンセル
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      function openEdit(id, date, mood, sleep, symptom, note) {
+        document.getElementById("edit-form").action = `/records/${id}/edit`;
+        document.getElementById("edit-date").value = date;
+        document.getElementById("edit-sleep").value = sleep;
+        document.getElementById("edit-symptom").value = symptom;
+        document.getElementById("edit-note").value = note;
+
+        // 気分スコアをセット
+        const radio = document.getElementById(`edit-mood${mood}`);
+        if (radio) radio.checked = true;
+
+        document.getElementById("modal").classList.add("active");
+      }
+
+      function closeModal() {
+        document.getElementById("modal").classList.remove("active");
+      }
+
+      // モーダル外クリックで閉じる
+      document.getElementById("modal").addEventListener("click", function (e) {
+        if (e.target === this) closeModal();
+      });
+    </script>
+  </body>
+</html>

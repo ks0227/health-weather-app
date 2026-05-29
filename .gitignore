@@ -1,0 +1,24 @@
+# データベース
+instance/
+*.db
+
+# Pythonキャッシュ
+__pycache__/
+*.pyc
+*.pyo
+
+# 環境変数
+.env
+
+# 仮想環境
+venv/
+.venv/
+env/
+
+# IDEの設定ファイル
+.vscode/
+.idea/
+
+# OS生成ファイル
+.DS_Store
+Thumbs.db
