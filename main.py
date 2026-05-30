@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template
 from database import init_db
 from routes.health import health_bp  
-from routes.analysis import analysis_bp  
+from routes.route_analysis import analysis_bp  
 from routes.dashboard import dashboard_bp  
 
 app = Flask(__name__)
