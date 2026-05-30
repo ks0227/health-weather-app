@@ -25,14 +25,14 @@
 
       .hero {
         text-align: center;
-        margin-bottom: 48px;
+        margin-bottom: 40px;
       }
       .hero .icon {
         font-size: 52px;
         margin-bottom: 16px;
       }
       .hero h1 {
-        font-size: 26px;
+        font-size: 24px;
         font-weight: 600;
         margin-bottom: 10px;
       }
@@ -44,7 +44,8 @@
 
       .cards {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        /* 4枚を均等に並べる */
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
         gap: 16px;
         width: 100%;
         max-width: 640px;
@@ -54,7 +55,7 @@
       .card {
         background: #fff;
         border-radius: 14px;
-        padding: 28px 20px;
+        padding: 24px 16px;
         text-align: center;
         text-decoration: none;
         color: #333;
@@ -63,18 +64,22 @@
           transform 0.15s,
           box-shadow 0.15s;
         border: 1.5px solid transparent;
+        -webkit-tap-highlight-color: transparent;
       }
       .card:hover {
         transform: translateY(-3px);
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
         border-color: #1d9e75;
       }
+      .card:active {
+        transform: scale(0.97);
+      }
       .card .card-icon {
         font-size: 32px;
         margin-bottom: 12px;
       }
       .card h2 {
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 600;
         margin-bottom: 6px;
       }
@@ -88,6 +93,35 @@
         font-size: 12px;
         color: #bbb;
         text-align: center;
+        line-height: 1.8;
+      }
+
+      /* スマホ：2列グリッドに切り替え */
+      @media (max-width: 480px) {
+        body {
+          padding: 16px;
+          justify-content: flex-start;
+          padding-top: 40px;
+        }
+        .hero {
+          margin-bottom: 28px;
+        }
+        .hero .icon {
+          font-size: 40px;
+        }
+        .hero h1 {
+          font-size: 20px;
+        }
+        .cards {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
+        }
+        .card {
+          padding: 20px 12px;
+        }
+        .card .card-icon {
+          font-size: 28px;
+        }
       }
     </style>
   </head>
@@ -96,10 +130,12 @@
       <div class="icon">🌤️</div>
       <h1>体調 × 天気 分析システム</h1>
       <p>
-        毎日の体調を記録して、天気との関係を可視化します。<br />気圧・気温・湿度があなたの体調に与える影響を発見しましょう。
+        毎日の体調を記録して、天気との関係を可視化します。<br />
+        気圧・気温・湿度があなたの体調に与える影響を発見しましょう。
       </p>
     </div>
 
+    <!-- 記録管理カードを .cards の中に移動 -->
     <div class="cards">
       <a href="/log" class="card">
         <div class="card-icon">📝</div>
@@ -118,13 +154,14 @@
         <h2>記録一覧</h2>
         <p>これまでの体調ログを<br />一覧で確認する</p>
       </a>
-    </div>
 
-    <a href="/records" class="card">
-      <div class="card-icon">🗂️</div>
-      <h2>記録管理</h2>
-      <p>過去の体調ログを<br />編集・削除する</p>
-    </a>
+      <!-- .cards の中に移動 -->
+      <a href="/records" class="card">
+        <div class="card-icon">🗂️</div>
+        <h2>記録管理</h2>
+        <p>過去の体調ログを<br />編集・削除する</p>
+      </a>
+    </div>
 
     <div class="footer">
       体調データは毎日記録するほど分析精度が上がります。<br />
