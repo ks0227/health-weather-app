@@ -351,7 +351,14 @@
             <td>
               <button
                 class="btn btn-edit"
-                onclick="openEdit({{ log.id }},'{{ log.date }}',{{ log.mood_score }},'{{ log.sleep_hours or '' }}','{{ log.symptom or '' }}','{{ log.note or '' }}')"
+                onclick='openEdit(
+                  {{ log.id }},
+                  {{ log.date|tojson }},
+                  {{ log.mood_score }},
+                  {{ (log.sleep_hours or "")|tojson }},
+                  {{ (log.symptom or "")|tojson }},
+                  {{ (log.note or "")|tojson }}
+                  )'
               >
                 編集
               </button>
