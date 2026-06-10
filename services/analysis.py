@@ -101,29 +101,19 @@ def compute_correlations(df):
 def compute_trend(df):
     df = df.copy()
 
-    df["mood_7d"] = (
-        df["mood_score"]
-        .rolling(7, min_periods=7)
-        .mean()
-        .round(2)
-    )
+    df["mood_7d"]        = df["mood_score"].rolling(7, min_periods=7).mean().round(2)
+    df["pressure_7d"]    = df["pressure"].rolling(7, min_periods=7).mean().round(2)
+    df["temperature_7d"] = df["temperature"].rolling(7, min_periods=7).mean().round(2)  # 追加
+    df["humidity_7d"]    = df["humidity"].rolling(7, min_periods=7).mean().round(2)     # 追加
 
-    df["pressure_7d"] = (
-        df["pressure"]
-        .rolling(7, min_periods=7)
-        .mean()
-        .round(2)
-    )
-
-    # NaN を None に変換（JSON対応）
     df = df.where(pd.notnull(df), other=None)
 
     return df[[
         "date",
-        "mood_score",
-        "mood_7d",
-        "pressure",
-        "pressure_7d"
+        "mood_score",    "mood_7d",
+        "pressure",      "pressure_7d",
+        "temperature",   "temperature_7d",  # 追加
+        "humidity",      "humidity_7d",     # 追加
     ]].assign(date=df["date"].astype(str)).to_dict("records")
 
 
