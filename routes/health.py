@@ -1,10 +1,13 @@
-from flask import Blueprint, request, jsonify
+from datetime import date
+
+from flask import Blueprint, jsonify, request
+
 from database import db
 from models import HealthLog
-from datetime import date
-from routes.weather import fetch_and_save_weather 
+from routes.weather import fetch_and_save_weather
 
 health_bp = Blueprint("health", __name__)
+
 
 # 体調ログを登録
 @health_bp.route("/health", methods=["POST"])
@@ -18,11 +21,11 @@ def create_health_log():
         return jsonify({"error": "mood_score は1〜5で入力してください"}), 400
 
     log = HealthLog(
-        date        = data.get("date", date.today()),
-        mood_score  = data["mood_score"],
-        sleep_hours = data.get("sleep_hours"),
-        symptom     = data.get("symptom"),
-        note        = data.get("note"),
+        date=data.get("date", date.today()),
+        mood_score=data["mood_score"],
+        sleep_hours=data.get("sleep_hours"),
+        symptom=data.get("symptom"),
+        note=data.get("note"),
     )
     db.session.add(log)
     db.session.commit()
@@ -62,8 +65,8 @@ def update_health_log(log_id):
         log.mood_score = data["mood_score"]
 
     log.sleep_hours = data.get("sleep_hours", log.sleep_hours)
-    log.symptom     = data.get("symptom",     log.symptom)
-    log.note        = data.get("note",         log.note)
+    log.symptom = data.get("symptom", log.symptom)
+    log.note = data.get("note", log.note)
 
     db.session.commit()
     return jsonify(log.to_dict())

@@ -1,10 +1,12 @@
 import os
-from flask_sqlalchemy import SQLAlchemy
+
 from dotenv import load_dotenv
+from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
 
 db = SQLAlchemy()
+
 
 def init_db(app):
     uri = os.getenv("DATABASE_URL", "sqlite:///health.db")
@@ -19,4 +21,5 @@ def init_db(app):
 
     with app.app_context():
         from models import HealthLog, WeatherData
+
         db.create_all()
