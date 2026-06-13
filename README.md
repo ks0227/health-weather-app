@@ -65,20 +65,27 @@
 ├── pyproject.toml           # Ruff設定
 ├── requirements.txt         # 依存ライブラリ一覧
 ├── .env.example             # 環境変数サンプル
+├── .gitignore               # Git除外設定
 ├── routes/
+│   ├── __init__.py
 │   ├── health.py            # 体調ログ CRUD API
 │   ├── weather.py           # 天気API連携（OpenWeatherMap / Open-Meteo）
 │   ├── route_analysis.py    # 相関分析エンドポイント
-│   └── dashboard.py        # ダッシュボード・入力フォーム・記録管理
+│   └── dashboard.py         # ダッシュボード・入力フォーム・記録管理
 ├── services/
+│   ├── __init__.py
 │   └── analysis.py          # 分析ロジック（Pandas / scipy）
-└── templates/
-    ├── index.html           # トップページ
-    ├── dashboard.html       # ダッシュボード画面
-    ├── log_form.html        # 体調入力フォーム
-    └── records.html         # 記録管理ページ
+├── templates/
+│   ├── index.html           # トップページ
+│   ├── dashboard.html       # ダッシュボード画面
+│   ├── log_form.html        # 体調入力フォーム
+│   └── records.html         # 記録管理ページ
+└── tests/
+    ├── __init__.py
+    ├── conftest.py          # テスト共通設定
+    ├── test_health_api.py   # APIエンドポイントのテスト
+    └── test_analysis.py     # 分析ロジックのテスト
 ```
-
 ---
 
 ## 🚀 セットアップ手順
