@@ -40,6 +40,13 @@ def to_dataframe(health_rows, weather_rows):
         ]
     )
 
+    # 空のDataFrameにカラムを明示的に追加
+    if df_health.empty:
+        df_health = pd.DataFrame(columns=["date", "mood_score", "sleep_hours"])
+
+    if df_weather.empty:
+        df_weather = pd.DataFrame(columns=["date", "temperature", "humidity", "pressure"])
+
     return df_health, df_weather
 
 
@@ -47,16 +54,19 @@ def to_dataframe(health_rows, weather_rows):
 # Preprocessing Layer
 # =========================
 def prepare_dataset(df_health, df_weather):
+    # データが空の場合のチェックを追加
+    if df_health.empty:
+        return None, "体調データがありません。まず体調を記録してください。"
+
+    if df_weather.empty:
+        return None, "天気データがありません。体調を記録すると自動で取得されます。"
+
     df = pd.merge(df_health, df_weather, on="date", how="inner")
 
-    # 日付不足チェック（ユニーク基準）
     if df["date"].nunique() < 7:
         return None, "体調と天気が一致する日が7日分以上ありません。"
 
-    # 欠損処理（安全版）
     df = df.dropna()
-
-    # 型保証
     df["date"] = pd.to_datetime(df["date"])
 
     return df.sort_values("date"), None

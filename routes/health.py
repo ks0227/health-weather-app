@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime  # datetime を追加
 
 from flask import Blueprint, jsonify, request
 
@@ -14,14 +14,23 @@ health_bp = Blueprint("health", __name__)
 def create_health_log():
     data = request.get_json()
 
-    # 必須チェック
     if not data or "mood_score" not in data:
         return jsonify({"error": "mood_score は必須です"}), 400
     if not (1 <= data["mood_score"] <= 5):
         return jsonify({"error": "mood_score は1〜5で入力してください"}), 400
 
+    # 日付の変換処理を追加
+    raw_date = data.get("date")
+    if raw_date:
+        if isinstance(raw_date, str):
+            log_date = datetime.strptime(raw_date, "%Y-%m-%d").date()
+        else:
+            log_date = raw_date
+    else:
+        log_date = date.today()
+
     log = HealthLog(
-        date=data.get("date", date.today()),
+        date=log_date,  # ← 変換済みのdateオブジェクトを使用
         mood_score=data["mood_score"],
         sleep_hours=data.get("sleep_hours"),
         symptom=data.get("symptom"),
@@ -30,11 +39,12 @@ def create_health_log():
     db.session.add(log)
     db.session.commit()
 
-    # 体調登録と同時に天気を自動取得 ← 追加
     try:
+        from routes.weather import fetch_and_save_weather
+
         fetch_and_save_weather(log.date)
     except Exception as e:
-        print(f"天気取得エラー（無視して続行）: {e}")
+        print(f"天気取得エラー: {e}")
 
     return jsonify(log.to_dict()), 201
 
@@ -49,14 +59,14 @@ def get_health_logs():
 # 体調ログを1件取得
 @health_bp.route("/health/<int:log_id>", methods=["GET"])
 def get_health_log(log_id):
-    log = HealthLog.query.get_or_404(log_id)
+    log = db.get_or_404(HealthLog, log_id)
     return jsonify(log.to_dict())
 
 
 # 体調ログを更新
 @health_bp.route("/health/<int:log_id>", methods=["PUT"])
 def update_health_log(log_id):
-    log = HealthLog.query.get_or_404(log_id)
+    log = db.get_or_404(HealthLog, log_id)
     data = request.get_json()
 
     if "mood_score" in data:
@@ -75,7 +85,7 @@ def update_health_log(log_id):
 # 体調ログを削除
 @health_bp.route("/health/<int:log_id>", methods=["DELETE"])
 def delete_health_log(log_id):
-    log = HealthLog.query.get_or_404(log_id)
+    log = db.get_or_404(HealthLog, log_id)
     db.session.delete(log)
     db.session.commit()
     return jsonify({"message": f"id={log_id} を削除しました"})

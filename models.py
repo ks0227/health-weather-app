@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from database import db
 
@@ -12,7 +12,7 @@ class HealthLog(db.Model):
     sleep_hours = db.Column(db.Float)  # 睡眠時間
     symptom = db.Column(db.String(200))  # 頭痛・倦怠感など
     note = db.Column(db.Text)  # 自由メモ
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def to_dict(self):
         return {
