@@ -157,11 +157,11 @@ def compute_trend(df):
 def classify_strength(r):
     abs_r = abs(r)
     if abs_r >= 0.7:
-        return "強く"
+        return "とても"
     elif abs_r >= 0.4:
         return "やや"
     else:
-        return "弱く"
+        return "少し"
 
 
 def summarize(health_col, weather_col, r, p):
