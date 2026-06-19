@@ -9,9 +9,8 @@
 
 ## 📌 制作背景
 
-「天気が悪い日は体調も悪い気がする」という経験をデータで検証したいと考え、本システムを開発しました。  
-体調の記録・天気の自動取得・相関分析・可視化までを一貫して実装し、  
-Webアプリとして実際に使える形に仕上げました。
+精神疾患の当事者として、天気の変化が体調に影響していると感じることが多く、「気のせいなのか、それともデータで確認できるのか」を自分自身で検証したいと考え、本システムを開発しました。
+体調の記録・天気の自動取得・相関分析・可視化までを一貫して実装し、Webアプリとして実際に使える形に仕上げました。自分自身が毎日使うツールとして開発したことで、ユーザー視点での使いやすさも意識しています。
 
 ---
 
@@ -66,20 +65,27 @@ Webアプリとして実際に使える形に仕上げました。
 ├── pyproject.toml           # Ruff設定
 ├── requirements.txt         # 依存ライブラリ一覧
 ├── .env.example             # 環境変数サンプル
+├── .gitignore               # Git除外設定
 ├── routes/
+│   ├── __init__.py
 │   ├── health.py            # 体調ログ CRUD API
 │   ├── weather.py           # 天気API連携（OpenWeatherMap / Open-Meteo）
 │   ├── route_analysis.py    # 相関分析エンドポイント
-│   └── dashboard.py        # ダッシュボード・入力フォーム・記録管理
+│   └── dashboard.py         # ダッシュボード・入力フォーム・記録管理
 ├── services/
+│   ├── __init__.py
 │   └── analysis.py          # 分析ロジック（Pandas / scipy）
-└── templates/
-    ├── index.html           # トップページ
-    ├── dashboard.html       # ダッシュボード画面
-    ├── log_form.html        # 体調入力フォーム
-    └── records.html         # 記録管理ページ
+├── templates/
+│   ├── index.html           # トップページ
+│   ├── dashboard.html       # ダッシュボード画面
+│   ├── log_form.html        # 体調入力フォーム
+│   └── records.html         # 記録管理ページ
+└── tests/
+    ├── __init__.py
+    ├── conftest.py          # テスト共通設定
+    ├── test_health_api.py   # APIエンドポイントのテスト
+    └── test_analysis.py     # 分析ロジックのテスト
 ```
-
 ---
 
 ## 🚀 セットアップ手順
