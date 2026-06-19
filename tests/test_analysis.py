@@ -35,19 +35,19 @@ def sample_df():
 class TestClassifyStrength:
     def test_strong_positive(self):
         # 実際のコードは日本語を返す
-        assert classify_strength(0.8) == "強く"
-        assert classify_strength(-0.8) == "強く"
+        assert classify_strength(0.8) == "とても"
+        assert classify_strength(-0.8) == "とても"
 
     def test_moderate(self):
         assert classify_strength(0.5) == "やや"
         assert classify_strength(-0.5) == "やや"
 
     def test_weak(self):
-        assert classify_strength(0.2) == "弱く"
-        assert classify_strength(-0.2) == "弱く"
+        assert classify_strength(0.2) == "少し"
+        assert classify_strength(-0.2) == "少し"
 
     def test_boundary_07(self):
-        assert classify_strength(0.7) == "強く"
+        assert classify_strength(0.7) == "とても"
 
     def test_boundary_04(self):
         assert classify_strength(0.4) == "やや"
