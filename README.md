@@ -1,5 +1,7 @@
 # 🌤️ 個人生活データ分析システム（体調 × 天気）
 
+![CI](https://github.com/ks0227/health-weather-app/actions/workflows/ci.yml/badge.svg)
+
 体調と天気の相関を自動で分析・可視化するWebアプリケーションです。  
 毎日の体調を記録するだけで、気圧・気温・湿度との関係をグラフで確認できます。
 
@@ -86,6 +88,7 @@
     ├── test_health_api.py   # APIエンドポイントのテスト
     └── test_analysis.py     # 分析ロジックのテスト
 ```
+
 ---
 
 ## 🚀 セットアップ手順
