@@ -12,3 +12,9 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 # テンプレートやルーターでの特殊なimportを許可
 "routes/*.py" = ["F811"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
