@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      # リポジトリをチェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Pythonのセットアップ
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 依存ライブラリのインストール
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Ruffでコードチェック
+      - name: Lint with Ruff
+        run: ruff check .
+
+      # Ruffでフォーマットチェック
+      - name: Format check with Ruff
+        run: ruff format --check .
+
+      # pytestでテスト実行
+      - name: Run tests
+        run: pytest tests/ -v
+        env:
+          # テスト用の環境変数
+          OPENWEATHER_API_KEY: dummy_key_for_test
+          CITY: Tokyo
+          SECRET_KEY: test-secret-key
