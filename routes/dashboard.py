@@ -24,11 +24,11 @@ def log_form():
 # フォーム送信
 @dashboard_bp.route("/log", methods=["POST"])
 def log_submit():
-    mood_score  = request.form.get("mood_score")
+    mood_score = request.form.get("mood_score")
     sleep_hours = request.form.get("sleep_hours")
-    symptom     = request.form.get("symptom")
-    note        = request.form.get("note")
-    log_date    = request.form.get("date")
+    symptom = request.form.get("symptom")
+    note = request.form.get("note")
+    log_date = request.form.get("date")
 
     if not mood_score:
         flash("気分スコアを選択してください", "error")
@@ -42,17 +42,18 @@ def log_submit():
         return redirect(url_for("dashboard.log_form"))
 
     log = HealthLog(
-        date        = parsed_date,
-        mood_score  = int(mood_score),
-        sleep_hours = float(sleep_hours) if sleep_hours else None,
-        symptom     = symptom or None,
-        note        = note or None,
+        date=parsed_date,
+        mood_score=int(mood_score),
+        sleep_hours=float(sleep_hours) if sleep_hours else None,
+        symptom=symptom or None,
+        note=note or None,
     )
     db.session.add(log)
     db.session.commit()
 
     try:
         from routes.weather import fetch_and_save_weather
+
         fetch_and_save_weather(log.date)
     except Exception as e:
         print(f"天気取得エラー: {e}")

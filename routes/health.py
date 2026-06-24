@@ -45,6 +45,7 @@ def create_health_log():
 
     try:
         from routes.weather import fetch_and_save_weather
+
         fetch_and_save_weather(log.date)
     except Exception as e:
         print(f"天気取得エラー: {e}")
