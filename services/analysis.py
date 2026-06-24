@@ -35,17 +35,17 @@ def to_dataframe(health_rows, weather_rows):
                 "temperature": r.temperature,
                 "humidity": r.humidity,
                 "pressure": r.pressure,
+                "pressure_change": r.pressure_change,  # ← 追加
             }
             for r in weather_rows
         ]
     )
 
-    # 空のDataFrameにカラムを明示的に追加
     if df_health.empty:
         df_health = pd.DataFrame(columns=["date", "mood_score", "sleep_hours"])
 
     if df_weather.empty:
-        df_weather = pd.DataFrame(columns=["date", "temperature", "humidity", "pressure"])
+        df_weather = pd.DataFrame(columns=["date", "temperature", "humidity", "pressure", "pressure_change"])
 
     return df_health, df_weather
 
@@ -77,13 +77,15 @@ def prepare_dataset(df_health, df_weather):
 # =========================
 def compute_correlations(df):
     health_cols = ["mood_score", "sleep_hours"]
-    weather_cols = ["temperature", "humidity", "pressure"]
+    weather_cols = ["temperature", "humidity", "pressure", "pressure_change"]  # ← 追加
 
     results = []
 
     for hc in health_cols:
         for wc in weather_cols:
-            # 定数チェック（値が全て同じ場合はスキップ）
+            if wc not in df.columns:
+                continue
+
             if df[hc].nunique() < 2 or df[wc].nunique() < 2:
                 results.append(
                     {
@@ -100,7 +102,12 @@ def compute_correlations(df):
                 )
                 continue
 
-            r, p = stats.spearmanr(df[hc], df[wc])
+            # pressure_changeはNaNが多い可能性があるため有効データのみで計算
+            valid = df[[hc, wc]].dropna()
+            if len(valid) < 7:
+                continue
+
+            r, p = stats.spearmanr(valid[hc], valid[wc])
 
             if pd.isna(r) or pd.isna(p):
                 continue
@@ -170,9 +177,17 @@ def summarize(health_col, weather_col, r, p):
 
     strength = classify_strength(r)
 
-    health_map = {"mood_score": "気分", "sleep_hours": "睡眠時間"}
+    health_map = {
+        "mood_score": "気分",
+        "sleep_hours": "睡眠時間",
+    }
 
-    weather_map = {"temperature": "気温", "humidity": "湿度", "pressure": "気圧"}
+    weather_map = {
+        "temperature": "気温",
+        "humidity": "湿度",
+        "pressure": "気圧",
+        "pressure_change": "気圧変化",  # ← 追加
+    }
 
     h = health_map[health_col]
     w = weather_map[weather_col]

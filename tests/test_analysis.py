@@ -13,7 +13,6 @@ from services.analysis import (
 
 @pytest.fixture
 def sample_df():
-    """分析テスト用のサンプルDataFrame（10日分）"""
     base = date(2024, 1, 1)
     records = []
     for i in range(10):
@@ -25,6 +24,7 @@ def sample_df():
                 "temperature": 10.0 + i,
                 "humidity": 50 + (i % 20),
                 "pressure": 1010.0 + (i % 5),
+                "pressure_change": float(i % 3 - 1),  # ← 追加
             }
         )
     df = pd.DataFrame(records)
@@ -75,9 +75,9 @@ class TestComputeCorrelations:
     """相関計算のテスト"""
 
     def test_result_count(self, sample_df):
-        # health_cols(2) × weather_cols(3) = 6件
+        # health_cols(2) × weather_cols(4) = 8件
         results = compute_correlations(sample_df)
-        assert len(results) == 6
+        assert len(results) == 8
 
     def test_required_keys(self, sample_df):
         results = compute_correlations(sample_df)

@@ -1,9 +1,7 @@
 import os
-from datetime import date
-
 import requests
+from datetime import date, timedelta
 from dotenv import load_dotenv
-
 from database import db
 from models import WeatherData
 
@@ -17,55 +15,23 @@ def fetch_and_save_weather(target_date: date = None) -> WeatherData:
     """天気データを取得してDBに保存"""
 
     if target_date is None:
-        target_date = date.today()
+        target_date = date.today() - timedelta(days=1)
 
-    # すでに同じ日のデータがあればそれを返す
     existing = WeatherData.query.filter_by(date=target_date).first()
     if existing:
         return existing
 
-    # 今日または未来は現在の天気APIを使う
-    if target_date >= date.today():
-        return fetch_current_weather(target_date)
-    else:
-        return fetch_historical_weather(target_date)
+    # 過去日付はOpen-Meteoで取得
+    weather = fetch_historical_weather(target_date)
 
-
-def fetch_current_weather(target_date: date) -> WeatherData:
-    """OpenWeatherMap APIで現在の天気を取得"""
-
-    API_KEY = os.getenv("OPENWEATHER_API_KEY")
-    CITY = os.getenv("CITY", "Kawagoe")
-
-    url = "https://api.openweathermap.org/data/2.5/weather"
-    params = {
-        "q": CITY,
-        "appid": API_KEY,
-        "units": "metric",
-        "lang": "ja",
-    }
-    response = requests.get(url, params=params)
-
-    if response.status_code != 200:
-        raise Exception(f"天気API エラー: {response.status_code} {response.text}")
-
-    data = response.json()
-
-    weather = WeatherData(
-        date=target_date,
-        temperature=data["main"]["temp"],
-        humidity=data["main"]["humidity"],
-        pressure=data["main"]["pressure"],
-        weather_desc=data["weather"][0]["description"],
-    )
-    db.session.add(weather)
-    db.session.commit()
+    # 前日比を計算して更新
+    weather = calc_pressure_change(weather, target_date)
 
     return weather
 
 
 def fetch_historical_weather(target_date: date) -> WeatherData:
-    """Open-Meteo APIで過去の天気データを取得（無料・APIキー不要）"""
+    """Open-Meteo APIで過去の天気データを取得"""
 
     url = "https://archive-api.open-meteo.com/v1/archive"
     params = {
@@ -89,7 +55,6 @@ def fetch_historical_weather(target_date: date) -> WeatherData:
     data = response.json()
     daily = data.get("daily", {})
 
-    # 降水量から天気の説明を生成
     precipitation = daily.get("precipitation_sum", [None])[0] or 0
     if precipitation == 0:
         weather_desc = "晴れ"
@@ -104,8 +69,41 @@ def fetch_historical_weather(target_date: date) -> WeatherData:
         humidity=daily.get("relative_humidity_2m_max", [None])[0],
         pressure=daily.get("pressure_msl_mean", [None])[0],
         weather_desc=weather_desc,
+        pressure_change=None,  # ← あとで計算
     )
     db.session.add(weather)
     db.session.commit()
+
+    return weather
+
+
+def calc_pressure_change(weather: WeatherData, target_date: date) -> WeatherData:
+    """前日の気圧変化（前日 - 前々日）を計算してDBを更新"""
+
+    prev_date = target_date - timedelta(days=1)  # 前日
+    prev_prev_date = target_date - timedelta(days=2)  # 前々日
+
+    # 前日データを取得
+    prev_weather = WeatherData.query.filter_by(date=prev_date).first()
+    if not prev_weather:
+        try:
+            prev_weather = fetch_historical_weather(prev_date)
+        except Exception as e:
+            print(f"前日データ取得エラー: {e}")
+            return weather
+
+    # 前々日データを取得
+    prev_prev_weather = WeatherData.query.filter_by(date=prev_prev_date).first()
+    if not prev_prev_weather:
+        try:
+            prev_prev_weather = fetch_historical_weather(prev_prev_date)
+        except Exception as e:
+            print(f"前々日データ取得エラー: {e}")
+            return weather
+
+    # 前日の気圧変化（前日 - 前々日）を記録日の weather に保存
+    if prev_weather.pressure is not None and prev_prev_weather.pressure is not None:
+        weather.pressure_change = round(prev_weather.pressure - prev_prev_weather.pressure, 1)
+        db.session.commit()
 
     return weather
