@@ -19,7 +19,7 @@ def create_health_log():
     if not (1 <= data["mood_score"] <= 5):
         return jsonify({"error": "mood_score は1〜5で入力してください"}), 400
 
-    # 日付の変換処理を追加
+    # 日付の変換
     raw_date = data.get("date")
     if raw_date:
         if isinstance(raw_date, str):
@@ -27,10 +27,14 @@ def create_health_log():
         else:
             log_date = raw_date
     else:
-        log_date = date.today()
+        log_date = date.today() - timedelta(days=1)  # デフォルトを昨日に変更
+
+    # 当日以降の日付は登録不可
+    if log_date >= date.today():
+        return jsonify({"error": "当日以降の日付は登録できません。前日までの日付を入力してください。"}), 400
 
     log = HealthLog(
-        date=log_date,  # ← 変換済みのdateオブジェクトを使用
+        date=log_date,
         mood_score=data["mood_score"],
         sleep_hours=data.get("sleep_hours"),
         symptom=data.get("symptom"),
@@ -41,7 +45,6 @@ def create_health_log():
 
     try:
         from routes.weather import fetch_and_save_weather
-
         fetch_and_save_weather(log.date)
     except Exception as e:
         print(f"天気取得エラー: {e}")

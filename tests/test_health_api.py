@@ -3,6 +3,7 @@ from datetime import date
 
 
 class TestHealthLogCreate:
+
     def test_create_valid_log(self, client):
         response = client.post(
             "/health",
@@ -12,7 +13,7 @@ class TestHealthLogCreate:
                     "sleep_hours": 7.5,
                     "symptom": "頭痛",
                     "note": "テスト",
-                    "date": "2024-01-01",  # ← 文字列固定に変更
+                    "date": "2024-01-01",
                 }
             ),
             content_type="application/json",
@@ -42,6 +43,32 @@ class TestHealthLogCreate:
         response = client.post(
             "/health",
             data=json.dumps({"mood_score": 0}),
+            content_type="application/json",
+        )
+        assert response.status_code == 400
+
+    def test_today_date_rejected(self, client):
+        """当日の日付は登録できない"""
+        response = client.post(
+            "/health",
+            data=json.dumps({
+                "mood_score": 3,
+                "date": str(date.today()),
+            }),
+            content_type="application/json",
+        )
+        assert response.status_code == 400
+
+    def test_future_date_rejected(self, client):
+        """未来の日付は登録できない"""
+        from datetime import timedelta
+        future_date = date.today() + timedelta(days=1)
+        response = client.post(
+            "/health",
+            data=json.dumps({
+                "mood_score": 3,
+                "date": str(future_date),
+            }),
             content_type="application/json",
         )
         assert response.status_code == 400

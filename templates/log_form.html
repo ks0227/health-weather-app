@@ -215,7 +215,13 @@
         <form method="POST" action="/log">
           <div class="field">
             <label>日付 <span class="required">*</span></label>
-            <input type="date" name="date" required value="{{ today }}" />
+            <input
+              type="date"
+              name="date"
+              required
+              value="{{ yesterday }}"
+              max="{{ yesterday }}"
+            />
           </div>
 
           <div class="field">
