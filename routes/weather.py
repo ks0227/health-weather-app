@@ -1,7 +1,9 @@
 import os
-import requests
 from datetime import date, timedelta
+
+import requests
 from dotenv import load_dotenv
+
 from database import db
 from models import WeatherData
 
