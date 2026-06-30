@@ -69,7 +69,7 @@ def fetch_historical_weather(target_date: date) -> WeatherData:
         humidity=daily.get("relative_humidity_2m_max", [None])[0],
         pressure=daily.get("pressure_msl_mean", [None])[0],
         weather_desc=weather_desc,
-        pressure_change_prev = None,  # ← 修正
+        pressure_change_prev=None,  # ← 修正
     )
     db.session.add(weather)
     db.session.commit()
@@ -80,7 +80,7 @@ def fetch_historical_weather(target_date: date) -> WeatherData:
 def calc_pressure_change(weather: WeatherData, target_date: date) -> WeatherData:
     """前日の気圧変化（前日 - 前々日）を計算してDBを更新"""
 
-    prev_date      = target_date - timedelta(days=1)
+    prev_date = target_date - timedelta(days=1)
     prev_prev_date = target_date - timedelta(days=2)
 
     prev_weather = WeatherData.query.filter_by(date=prev_date).first()

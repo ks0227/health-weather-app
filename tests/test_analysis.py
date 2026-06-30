@@ -18,12 +18,12 @@ def sample_df():
     for i in range(10):
         records.append(
             {
-                "date":                 base + timedelta(days=i),
-                "mood_score":           (i % 5) + 1,
-                "sleep_hours":          6.0 + (i % 3),
-                "temperature":          10.0 + i,
-                "humidity":             50 + (i % 20),
-                "pressure":             1010.0 + (i % 5),
+                "date": base + timedelta(days=i),
+                "mood_score": (i % 5) + 1,
+                "sleep_hours": 6.0 + (i % 3),
+                "temperature": 10.0 + i,
+                "humidity": 50 + (i % 20),
+                "pressure": 1010.0 + (i % 5),
                 "pressure_change_prev": float(i % 3 - 1),  # ← 修正
             }
         )
