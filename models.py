@@ -34,7 +34,7 @@ class WeatherData(db.Model):
     humidity = db.Column(db.Integer)  # 湿度（%）
     pressure = db.Column(db.Float)  # 気圧（hPa）
     weather_desc = db.Column(db.String(100))  # 例: "曇り"
-    pressure_change = db.Column(db.Float)  # → 意味: 前日の気圧変化（前日 - 前々日）
+    pressure_change_prev = db.Column(db.Float)
 
     def to_dict(self):
         return {
@@ -44,5 +44,5 @@ class WeatherData(db.Model):
             "humidity": self.humidity,
             "pressure": self.pressure,
             "weather_desc": self.weather_desc,
-            "pressure_change": self.pressure_change,  # ← 追加
+            "pressure_change_prev": self.pressure_change_prev,  # ← 修正
         }

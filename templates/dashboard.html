@@ -274,7 +274,7 @@
         <div class="corr-item {{ cls }}">
           <div class="label">
             {{ {"temperature": "気温", "humidity": "湿度", "pressure": "気圧",
-            "pressure_change": "気圧変化（前日比）"}[item.weather] }} {% if
+            "pressure_change_prev": "前日の気圧変化"}[item.weather] }}{% if
             item.significant_05 %}
             <span class="badge badge-significant">統計的に有意 ✓</span>
             {% elif item.significant_10 %}
