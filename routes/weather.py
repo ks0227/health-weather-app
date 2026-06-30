@@ -23,10 +23,7 @@ def fetch_and_save_weather(target_date: date = None) -> WeatherData:
     if existing:
         return existing
 
-    # 過去日付はOpen-Meteoで取得
     weather = fetch_historical_weather(target_date)
-
-    # 前日比を計算して更新
     weather = calc_pressure_change(weather, target_date)
 
     return weather
@@ -71,7 +68,8 @@ def fetch_historical_weather(target_date: date) -> WeatherData:
         humidity=daily.get("relative_humidity_2m_max", [None])[0],
         pressure=daily.get("pressure_msl_mean", [None])[0],
         weather_desc=weather_desc,
-        pressure_change_prev=None,  # ← 修正
+        pressure_change_prev=None,
+        pressure_range_prev=None,
     )
     db.session.add(weather)
     db.session.commit()
@@ -79,8 +77,35 @@ def fetch_historical_weather(target_date: date) -> WeatherData:
     return weather
 
 
+def fetch_pressure_range(target_date: date) -> float | None:
+    """指定日の1日の気圧変化幅（最大-最小）をOpen-Meteoの時間別データから取得"""
+
+    url = "https://archive-api.open-meteo.com/v1/archive"
+    params = {
+        "latitude": LAT,
+        "longitude": LON,
+        "start_date": str(target_date),
+        "end_date": str(target_date),
+        "hourly": "pressure_msl",
+        "timezone": "Asia/Tokyo",
+    }
+    response = requests.get(url, params=params)
+
+    if response.status_code != 200:
+        return None
+
+    data = response.json()
+    pressures = data.get("hourly", {}).get("pressure_msl", [])
+    pressures = [p for p in pressures if p is not None]
+
+    if not pressures:
+        return None
+
+    return round(max(pressures) - min(pressures), 1)
+
+
 def calc_pressure_change(weather: WeatherData, target_date: date) -> WeatherData:
-    """前日の気圧変化（前日 - 前々日）を計算してDBを更新"""
+    """前日の気圧変化（前日-前々日）と前日の気圧変化幅を計算してDBを更新"""
 
     prev_date = target_date - timedelta(days=1)
     prev_prev_date = target_date - timedelta(days=2)
@@ -99,12 +124,23 @@ def calc_pressure_change(weather: WeatherData, target_date: date) -> WeatherData
             prev_prev_weather = fetch_historical_weather(prev_prev_date)
         except Exception as e:
             print(f"前々日データ取得エラー: {e}")
-            return weather
+            prev_prev_weather = None
 
-    if prev_weather.pressure is not None and prev_prev_weather.pressure is not None:
-        weather.pressure_change_prev = round(  # ← 修正
-            prev_weather.pressure - prev_prev_weather.pressure, 1
-        )
-        db.session.commit()
+    # 前日の気圧変化（前日 - 前々日）
+    if prev_prev_weather and prev_weather.pressure is not None and prev_prev_weather.pressure is not None:
+        weather.pressure_change_prev = round(prev_weather.pressure - prev_prev_weather.pressure, 1)
+
+    # 前日の気圧変化幅（前日1日の最大-最小）
+    if prev_weather.pressure_range_prev is None:
+        try:
+            range_value = fetch_pressure_range(prev_date)
+            prev_weather.pressure_range_prev = range_value
+        except Exception as e:
+            print(f"気圧変化幅取得エラー: {e}")
+
+    # 「前日の気圧変化幅」を記録日のweatherにも持たせる
+    weather.pressure_range_prev = prev_weather.pressure_range_prev
+
+    db.session.commit()
 
     return weather

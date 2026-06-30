@@ -25,6 +25,7 @@ def sample_df():
                 "humidity": 50 + (i % 20),
                 "pressure": 1010.0 + (i % 5),
                 "pressure_change_prev": float(i % 3 - 1),  # ← 修正
+                "pressure_range_prev": float(2 + (i % 4)),  # ← 追加
             }
         )
     df = pd.DataFrame(records)
@@ -75,9 +76,9 @@ class TestComputeCorrelations:
     """相関計算のテスト"""
 
     def test_result_count(self, sample_df):
-        # health_cols(2) × weather_cols(4) = 8件
+        # health_cols(2) × weather_cols(5) = 10件
         results = compute_correlations(sample_df)
-        assert len(results) == 8
+        assert len(results) == 10
 
     def test_required_keys(self, sample_df):
         results = compute_correlations(sample_df)

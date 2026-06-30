@@ -36,6 +36,7 @@ def to_dataframe(health_rows, weather_rows):
                 "humidity": r.humidity,
                 "pressure": r.pressure,
                 "pressure_change_prev": r.pressure_change_prev,  # ← 修正
+                "pressure_range_prev": r.pressure_range_prev,  # ← 追加
             }
             for r in weather_rows
         ]
@@ -79,7 +80,13 @@ def prepare_dataset(df_health, df_weather):
 # =========================
 def compute_correlations(df):
     health_cols = ["mood_score", "sleep_hours"]
-    weather_cols = ["temperature", "humidity", "pressure", "pressure_change_prev"]  # ← 修正
+    weather_cols = [
+        "temperature",
+        "humidity",
+        "pressure",
+        "pressure_change_prev",
+        "pressure_range_prev",
+    ]  # ← 修正
 
     results = []
 
@@ -188,6 +195,7 @@ def summarize(health_col, weather_col, r, p):
         "humidity": "湿度",
         "pressure": "気圧",
         "pressure_change_prev": "前日の気圧変化",  # ← 修正
+        "pressure_range_prev": "前日の気圧変化幅",  # ← 追加
     }
 
     h = health_map[health_col]
