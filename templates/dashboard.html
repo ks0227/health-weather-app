@@ -275,7 +275,9 @@
           <div class="label">
             {{ { "temperature": "気温", "humidity": "湿度", "pressure": "気圧",
             "pressure_change_prev": "前日の気圧変化", "pressure_range_prev":
-            "前日の気圧変化幅" }[item.weather] }}{% if item.significant_05 %}
+            "前日の気圧変化幅", "temperature_change_prev": "前日の気温変化",
+            "humidity_change_prev": "前日の湿度変化" }[item.weather] }}{% if
+            item.significant_05 %}
             <span class="badge badge-significant">統計的に有意 ✓</span>
             {% elif item.significant_10 %}
             <span class="badge badge-marginal">参考値</span>

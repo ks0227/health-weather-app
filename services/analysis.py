@@ -37,6 +37,8 @@ def to_dataframe(health_rows, weather_rows):
                 "pressure": r.pressure,
                 "pressure_change_prev": r.pressure_change_prev,  # ← 修正
                 "pressure_range_prev": r.pressure_range_prev,  # ← 追加
+                "temperature_change_prev": r.temperature_change_prev,  # ← 追加
+                "humidity_change_prev": r.humidity_change_prev,  # ← 追加
             }
             for r in weather_rows
         ]
@@ -86,6 +88,8 @@ def compute_correlations(df):
         "pressure",
         "pressure_change_prev",
         "pressure_range_prev",
+        "temperature_change_prev",
+        "humidity_change_prev",  # ← 追加
     ]  # ← 修正
 
     results = []
@@ -196,6 +200,8 @@ def summarize(health_col, weather_col, r, p):
         "pressure": "気圧",
         "pressure_change_prev": "前日の気圧変化",  # ← 修正
         "pressure_range_prev": "前日の気圧変化幅",  # ← 追加
+        "temperature_change_prev": "前日の気温変化",  # ← 追加
+        "humidity_change_prev": "前日の湿度変化",  # ← 追加
     }
 
     h = health_map[health_col]
