@@ -3,9 +3,9 @@ import os
 from flask import Flask, render_template
 
 from database import init_db
+from routes.analysis import analysis_bp
 from routes.dashboard import dashboard_bp
 from routes.health import health_bp
-from routes.analysis import analysis_bp
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "a3f8k2m9x7q1p4n6")
