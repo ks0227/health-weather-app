@@ -344,6 +344,9 @@
               <span class="mood"
                 >{{ ["😞","😕","😐","🙂","😄"][log.mood_score - 1] }}</span
               >
+              <span style="font-size: 13px; color: #888; margin-left: 4px"
+                >{{ log.mood_score }}</span
+              >
             </td>
             <td>{{ log.sleep_hours or "−" }}h</td>
             <td>{{ log.symptom or "−" }}</td>
@@ -389,6 +392,9 @@
         <div class="log-card-date">{{ log.date }}</div>
         <div class="log-card-mood">
           {{ ["😞","😕","😐","🙂","😄"][log.mood_score - 1] }}
+          <span style="font-size: 14px; color: #888; margin-left: 4px"
+            >{{ log.mood_score }}</span
+          >
         </div>
       </div>
       <div class="log-card-body">
