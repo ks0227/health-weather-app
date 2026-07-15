@@ -13,107 +13,132 @@
       rel="stylesheet"
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
     <style>
-      body {
-        font-family: "M PLUS 1p", sans-serif;
-        background: #f8f9fa;
+      :root {
+        --primary-color: #2b6cb0; /* 落ち着いたダークブルー */
+        --accent-color: #319795; /* 整ったティールブルー */
+        --bg-light: #f7fafc; /* ほんのり青みのあるクリーンな背景 */
+        --text-dark: #2d3748;
       }
 
-      /* ナビバー */
+      body {
+        font-family: "Noto Sans JP", sans-serif;
+        background: var(--bg-light);
+        color: var(--text-dark);
+      }
+
+      /* ナビバーをシンプルかつ上質に */
+      .navbar {
+        background: #ffffff !important;
+        border-bottom: 1px solid #e2e8f0;
+      }
       .navbar-brand {
         font-weight: 700;
-        font-size: 1.2rem;
+        color: var(--primary-color) !important;
+      }
+      .nav-link {
+        color: #4a5568 !important;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      .nav-link:hover {
+        color: var(--primary-color) !important;
       }
 
-      /* カルーセル */
-      .carousel-item {
-        height: 480px;
-        background: linear-gradient(135deg, #1d9e75 0%, #378add 100%);
+      /* ヒーローエリア（カルーセルを廃止し、静的で知的なファーストビューへ） */
+      .hero-section {
+        background: linear-gradient(180deg, #ffffff 0%, var(--bg-light) 100%);
+        padding: 100px 0 80px 0;
       }
-      .carousel-item.slide-2 {
-        background: linear-gradient(135deg, #378add 0%, #7b1fa2 100%);
-      }
-      .carousel-item.slide-3 {
-        background: linear-gradient(135deg, #ef6c00 0%, #1d9e75 100%);
-      }
-      .carousel-caption {
-        bottom: 30%;
-      }
-      .carousel-caption h2 {
-        font-size: 2.2rem;
+      .hero-title {
+        font-size: 2.8rem;
         font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.3;
+        color: #1a202c;
       }
-      .carousel-caption p {
-        font-size: 1.1rem;
-        opacity: 0.9;
+      .hero-title span {
+        color: var(--primary-color);
       }
 
-      /* 機能カード */
+      /* 機能カード（角丸を少しシャープにし、影を極限まで自然に） */
       .feature-card {
-        border: none;
-        border-radius: 16px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #ffffff;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         transition:
-          transform 0.15s,
-          box-shadow 0.15s;
+          transform 0.2s,
+          box-shadow 0.2s;
         text-decoration: none;
         color: inherit;
         display: block;
       }
       .feature-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08);
         color: inherit;
+        border-color: var(--primary-color);
       }
-      .feature-icon {
-        font-size: 2.8rem;
-        margin-bottom: 1rem;
+      .feature-icon-wrapper {
+        width: 60px;
+        height: 60px;
+        background: rgba(43, 108, 176, 0.08);
+        color: var(--primary-color);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin: 0 auto 1.5rem auto;
       }
       .feature-card .card-title {
-        font-weight: 600;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
       }
 
       /* フィーチャーセクション */
-      .featurette-divider {
-        margin: 3rem 0;
+      .section-tag {
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--accent-color);
+        letter-spacing: 0.05em;
+        display: inline-block;
+        margin-bottom: 0.75rem;
       }
       .featurette-heading {
-        font-size: 2rem;
+        font-size: 2.2rem;
         font-weight: 700;
-        color: #333;
-      }
-      .featurette-heading span {
-        color: #1d9e75;
+        color: #1a202c;
+        line-height: 1.4;
       }
 
       /* フッター */
       footer {
-        background: #343a40;
-        color: #adb5bd;
+        background: #1a202c;
+        color: #a0aec0;
       }
       footer a {
-        color: #6ea8fe;
+        color: #e2e8f0;
+        text-decoration: none;
       }
-
-      .feature-icon {
-        font-size: 2.8rem;
-        margin-bottom: 1rem;
-      }
-      .navbar-brand i {
-        margin-right: 4px;
+      footer a:hover {
+        color: #ffffff;
       }
     </style>
   </head>
   <body>
     <!-- ナビバー -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
       <div class="container">
-        <a class="navbar-brand" href="/"
-          ><i class="bi bi-cloud-sun"></i> 体調 × 天気</a
-        >
+        <a class="navbar-brand" href="/">
+          <i class="bi bi-cloud-sun-fill me-2"></i>体調 × 天気
+        </a>
         <button
           class="navbar-toggler"
           type="button"
@@ -126,17 +151,17 @@
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
               <a class="nav-link" href="/log"
-                ><i class="bi bi-pencil-square"></i> 体調を記録</a
+                ><i class="bi bi-pencil-square me-1"></i>記録</a
               >
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/dashboard"
-                ><i class="bi bi-bar-chart-line"></i> ダッシュボード</a
+                ><i class="bi bi-bar-chart-line-fill me-1"></i>ダッシュボード</a
               >
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/records"
-                ><i class="bi bi-folder2-open"></i> 記録管理</a
+                ><i class="bi bi-folder2-open me-1"></i>管理</a
               >
             </li>
           </ul>
@@ -144,217 +169,107 @@
       </div>
     </nav>
 
-    <!-- カルーセル -->
-    <div id="mainCarousel" class="carousel slide" data-bs-ride="carousel">
-      <div class="carousel-indicators">
-        <button
-          type="button"
-          data-bs-target="#mainCarousel"
-          data-bs-slide-to="0"
-          class="active"
-        ></button>
-        <button
-          type="button"
-          data-bs-target="#mainCarousel"
-          data-bs-slide-to="1"
-        ></button>
-        <button
-          type="button"
-          data-bs-target="#mainCarousel"
-          data-bs-slide-to="2"
-        ></button>
-      </div>
-      <div class="carousel-inner">
-        <div class="carousel-item active">
-          <div class="d-flex align-items-center justify-content-center h-100">
-            <div
-              class="carousel-caption text-center position-relative"
-              style="bottom: 0"
+    <!-- ヒーローセクション（カルーセルを廃止し、スマートな印象に） -->
+    <section class="hero-section">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6">
+            <span class="section-tag">Weather x Health Analytics</span>
+            <h1 class="hero-title mb-4">
+              天気の変化と体調の相関を<br /><span>科学的に解き明かす。</span>
+            </h1>
+            <p
+              class="lead text-muted mb-5"
+              style="font-size: 1.1rem; line-height: 1.8"
             >
-              <h2>体調 × 天気 分析システム</h2>
-              <p>毎日の体調を記録して、気圧・気温・湿度との関係を発見しよう</p>
-              <a href="/log" class="btn btn-light btn-lg mt-2 me-2"
+              毎日の体調変化を気圧や湿度などの気象データと突き合わせ、あなただけの「気象病」のパターンを分析。スピアマン順位相関を用いた確かなデータ分析で、対策をサポートします。
+            </p>
+            <div class="d-flex gap-3">
+              <a
+                href="/log"
+                class="btn btn-primary btn-lg px-4"
+                style="background: var(--primary-color); border: none"
                 >今日の体調を記録</a
               >
-              <a href="/dashboard" class="btn btn-outline-light btn-lg mt-2"
-                >分析を見る</a
+              <a href="/dashboard" class="btn btn-outline-secondary btn-lg px-4"
+                >分析結果を表示</a
               >
             </div>
           </div>
-        </div>
-
-        <div class="carousel-item slide-2">
-          <div class="d-flex align-items-center justify-content-center h-100">
+          <div class="col-lg-6 mt-5 mt-lg-0 text-center">
+            <!-- 実際のアプリのダッシュボード画面などをここにはめ込むと、一気に「本物」感が出ます -->
             <div
-              class="carousel-caption text-center position-relative"
-              style="bottom: 0"
+              class="p-2 bg-white rounded-3 shadow-lg"
+              style="border: 1px solid #e2e8f0"
             >
-              <h2><i class="bi bi-search"></i> スピアマン相関分析</h2>
-              <p>
-                気分スコアが順序尺度であることを考慮した統計手法で<br />天気と体調の関係を科学的に分析します
-              </p>
-              <a href="/dashboard" class="btn btn-light btn-lg mt-2"
-                >分析結果を確認する</a
-              >
-            </div>
-          </div>
-        </div>
-
-        <div class="carousel-item slide-3">
-          <div class="d-flex align-items-center justify-content-center h-100">
-            <div
-              class="carousel-caption text-center position-relative"
-              style="bottom: 0"
-            >
-              <h2><i class="bi bi-graph-up"></i> トレンドを可視化</h2>
-              <p>
-                気圧・気温・湿度の7日移動平均グラフで<br />体調と天気の長期的なトレンドを確認できます
-              </p>
-              <a href="/dashboard" class="btn btn-light btn-lg mt-2"
-                >グラフを見る</a
-              >
+              <img
+                src="{{ url_for('static', filename='images/app-preview.png') }}"
+                class="img-fluid rounded-2"
+                alt="システムダッシュボードプレビュー"
+                onerror="
+                  this.src =
+                    'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80'
+                "
+              />
             </div>
           </div>
         </div>
       </div>
-      <button
-        class="carousel-control-prev"
-        type="button"
-        data-bs-target="#mainCarousel"
-        data-bs-slide="prev"
-      >
-        <span class="carousel-control-prev-icon"></span>
-      </button>
-      <button
-        class="carousel-control-next"
-        type="button"
-        data-bs-target="#mainCarousel"
-        data-bs-slide="next"
-      >
-        <span class="carousel-control-next-icon"></span>
-      </button>
-    </div>
+    </section>
 
-    <!-- 機能カード -->
-    <div class="container my-5">
+    <!-- 機能カード（洗練されたスタイルに変更） -->
+    <div class="container my-5 py-4">
       <div class="row g-4 justify-content-center">
-        <div class="col-md-3">
-          <a href="/log" class="feature-card card h-100 p-4 text-center">
-            <div class="feature-icon"><i class="bi bi-pencil-square"></i></div>
-            <div class="card-body p-0">
-              <h5 class="card-title">体調を記録する</h5>
-              <p class="card-text text-muted small">
-                気分・睡眠・症状を毎日記録。天気は自動で取得されます。
-              </p>
+        <div class="col-md-4">
+          <a href="/log" class="feature-card h-100 p-5 text-center">
+            <div class="feature-icon-wrapper">
+              <i class="bi bi-pencil-square"></i>
             </div>
+            <h5 class="card-title">1. 体調をシンプルに記録</h5>
+            <p class="text-muted small mb-0 lh-lg">
+              気分・睡眠・症状を数タップで記録。その瞬間の気圧や気象データはバックグラウンドで自動的に取得・同期されます。
+            </p>
           </a>
         </div>
-        <div class="col-md-3">
-          <a href="/dashboard" class="feature-card card h-100 p-4 text-center">
-            <div class="feature-icon"><i class="bi bi-bar-chart-line"></i></div>
-            <div class="card-body p-0">
-              <h5 class="card-title">ダッシュボード</h5>
-              <p class="card-text text-muted small">
-                相関ヒートマップとトレンドグラフで分析結果を確認。
-              </p>
+        <div class="col-md-4">
+          <a href="/dashboard" class="feature-card h-100 p-5 text-center">
+            <div class="feature-icon-wrapper">
+              <i class="bi bi-bar-chart-line-fill"></i>
             </div>
+            <h5 class="card-title">2. 相関トレンドの可視化</h5>
+            <p class="text-muted small mb-0 lh-lg">
+              スピアマン相関ヒートマップや気圧の7日移動平均グラフなど、多角的なデータビジュアライゼーションをリアルタイムに生成。
+            </p>
           </a>
         </div>
-        <div class="col-md-3">
-          <a href="/records" class="feature-card card h-100 p-4 text-center">
-            <div class="feature-icon"><i class="bi bi-folder2-open"></i></div>
-            <div class="card-body p-0">
-              <h5 class="card-title">記録管理</h5>
-              <p class="card-text text-muted small">
-                過去の体調ログを一覧表示・編集・削除できます。
-              </p>
+        <div class="col-md-4">
+          <a href="/records" class="feature-card h-100 p-5 text-center">
+            <div class="feature-icon-wrapper">
+              <i class="bi bi-folder2-open"></i>
             </div>
+            <h5 class="card-title">3. スマートなログ管理</h5>
+            <p class="text-muted small mb-0 lh-lg">
+              過去に記録した体調ログをタイムライン形式で一覧。必要に応じた素早い編集や、データの振り返りがスムーズに行えます。
+            </p>
           </a>
         </div>
       </div>
     </div>
 
-    <hr class="featurette-divider container" />
+    <!-- 変更のポイント: 各フィーチャーセクションも、余白を広く、イラスト部分をリアルなモックアップや写真に変えることで、AIっぽさを劇的に減らせます -->
 
-    <!-- フィーチャーセクション① -->
-    <div class="container">
-      <div class="row align-items-center py-4">
-        <div class="col-md-7">
-          <h2 class="featurette-heading">
-            天気が体調に与える影響を<br />
-            <span>データで可視化。</span>
-          </h2>
-          <p class="lead text-muted">
-            「雨の日は頭痛がする」「低気圧のときに体調が悪い」という経験を、
-            スピアマン順位相関とPlotlyによるインタラクティブグラフで科学的に検証します。
-          </p>
-        </div>
-        <div class="col-md-5">
-          <img
-            src="{{ url_for('static', filename='images/undraw_clouds_bmtk.svg') }}"
-            class="img-fluid"
-            alt="天気と体調"
-          />
-        </div>
-      </div>
-
-      <hr class="featurette-divider" />
-
-      <!-- フィーチャーセクション② -->
-      <div class="row align-items-center py-4">
-        <div class="col-md-5 order-md-1">
-          <img
-            src="{{ url_for('static', filename='images/undraw_mobile-web_eqrb.svg') }}"
-            class="img-fluid"
-            alt="スマホ対応"
-          />
-        </div>
-        <div class="col-md-7 order-md-2">
-          <h2 class="featurette-heading">
-            スマホからも<br />
-            <span>かんたん記録。</span>
-          </h2>
-          <p class="lead text-muted">
-            レスポンシブデザインでスマホからも快適に体調を記録できます。
-            気分スコアを絵文字でタップするだけで、天気データは自動で取得・保存されます。
-          </p>
-        </div>
-      </div>
-
-      <hr class="featurette-divider" />
-
-      <!-- フィーチャーセクション③ -->
-      <div class="row align-items-center py-4">
-        <div class="col-md-7">
-          <h2 class="featurette-heading">
-            前日の気圧変化まで<br />
-            <span>分析対象に。</span>
-          </h2>
-          <p class="lead text-muted">
-            当日の気象データだけでなく、前日の気圧変化・気圧変化幅・気温湿度の変化も記録・分析。
-            体調への影響が翌日に現れるラグ効果も検出します。
-          </p>
-        </div>
-        <div class="col-md-5">
-          <img
-            src="{{ url_for('static', filename='images/undraw_dashboard_p93p.svg') }}"
-            class="img-fluid"
-            alt="気圧変化分析"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- フッター -->
-    <footer class="py-4 mt-5">
+    <footer class="py-5 mt-5">
       <div class="container text-center">
-        <p class="mb-1">
-          体調データは毎日記録するほど分析精度が上がります。30日分以上の記録がたまると相関が見えてきます。
+        <p class="mb-2 text-white-50">
+          データが蓄積されるほど（目安：30日以上）、あなただけの気象相関分析の精度が向上します。
         </p>
         <p class="mb-0 small">
-          <a href="https://github.com/ks0227/health-weather-app" target="_blank"
-            ><i class="bi bi-github"></i>GitHub</a
+          <a
+            href="https://github.com/ks0227/health-weather-app"
+            target="_blank"
           >
+            <i class="bi bi-github me-1"></i>GitHub Repository
+          </a>
         </p>
       </div>
     </footer>
