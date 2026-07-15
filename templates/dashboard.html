@@ -3,444 +3,564 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>体調×天気 ダッシュボード</title>
+    <title>体調 × 天気 ダッシュボード</title>
+    <!-- Plotly.js -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- Bootstrap 5 & Icons -->
     <link
-      href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@400;500;700&display=swap"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <!-- 統一フォント Noto Sans JP -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
     <style>
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
+      :root {
+        --primary-color: #2b6cb0; /* ダークブルー */
+        --primary-hover: #1e4e80;
+        --primary-light: rgba(43, 108, 176, 0.08);
+        --accent-color: #319795; /* ティールブルー */
+        --accent-hover: #236e6c;
+        --bg-light: #f7fafc; /* クリーンな背景 */
+        --text-dark: #2d3748;
+        --border-color: #e2e8f0;
       }
 
       body {
-        font-family: "M PLUS 1p", sans-serif;
-        background: #f5f5f5;
-        padding: 16px;
-        padding-bottom: 40px;
-        color: #333;
+        font-family: "Noto Sans JP", sans-serif;
+        background: var(--bg-light);
+        color: var(--text-dark);
+        padding-bottom: 60px;
       }
 
-      .nav {
-        margin-bottom: 16px;
+      /* ナビバー（共通デザイン） */
+      .navbar {
+        background: #ffffff !important;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 40px;
       }
-      .nav a {
-        color: #1d9e75;
-        text-decoration: none;
-        font-size: 13px;
-        display: inline-block;
-        padding: 4px 0;
+      .navbar-brand {
+        font-weight: 700;
+        color: var(--primary-color) !important;
+      }
+      .nav-link {
+        color: #4a5568 !important;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      .nav-link:hover {
+        color: var(--primary-color) !important;
+      }
+
+      /* メインコンテナ */
+      .content-container {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 16px;
       }
 
       h1 {
-        font-size: 20px;
-        margin-bottom: 4px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 8px;
+        letter-spacing: -0.01em;
       }
       .subtitle {
-        color: #888;
-        font-size: 13px;
-        margin-bottom: 20px;
+        color: #718096;
+        font-size: 0.875rem;
+        margin-bottom: 30px;
+        line-height: 1.6;
       }
 
-      /* サマリーカード */
+      /* ===== サマリーカード ===== */
       .cards {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin-bottom: 24px;
+        gap: 16px;
+        margin-bottom: 30px;
       }
-      .card {
-        background: #fff;
+      .card-summary {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
         border-radius: 12px;
-        padding: 16px;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        padding: 20px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
       }
-      .card h2 {
-        font-size: 12px;
-        color: #888;
-        margin-bottom: 8px;
+      .card-summary h2 {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #718096;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
       }
-      .card .value {
-        font-size: 22px;
-        font-weight: 500;
-      }
-      .card .desc {
-        font-size: 11px;
-        color: #aaa;
+      .card-summary .value {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--primary-color);
         margin-top: 4px;
       }
+      .card-summary .desc {
+        font-size: 11px;
+        color: #a0aec0;
+        margin-top: 6px;
+      }
 
-      /* チャートカード */
+      /* ===== チャートカード ===== */
       .chart-card {
-        background: #fff;
+        background: #ffffff;
+        border: 1px solid var(--border-color);
         border-radius: 12px;
-        padding: 16px;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-        margin-bottom: 16px;
-        /* グラフがはみ出ないよう */
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+        margin-bottom: 24px;
         overflow: hidden;
       }
       .chart-card h2 {
-        font-size: 14px;
-        margin-bottom: 12px;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 16px;
+        border-left: 4px solid var(--accent-color);
+        padding-left: 10px;
       }
 
-      /* 相関サマリー */
+      /* ===== 相関サマリーグリッド ===== */
       .corr-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 12px;
       }
       .corr-item {
         border-radius: 8px;
-        padding: 12px 14px;
+        padding: 16px;
         font-size: 13px;
+        border: 1px solid transparent;
       }
       .corr-item .label {
-        color: #888;
-        margin-bottom: 4px;
+        font-weight: 700;
+        margin-bottom: 8px;
         font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
       }
       .corr-item .r-value {
-        font-size: 20px;
-        font-weight: 500;
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 4px;
       }
       .corr-item .summary {
-        font-size: 11px;
-        margin-top: 6px;
+        font-size: 12px;
         line-height: 1.5;
       }
 
+      /* 相関傾向ごとの背景（上質なトーンに減色） */
       .positive {
-        background: #e8f5e9;
-        color: #2e7d32;
+        background: rgba(49, 151, 149, 0.06);
+        color: #234e52;
+        border-color: rgba(49, 151, 149, 0.2);
       }
       .negative {
-        background: #fce4ec;
-        color: #c62828;
+        background: rgba(229, 62, 62, 0.05);
+        color: #742a2a;
+        border-color: rgba(229, 62, 62, 0.15);
       }
       .neutral {
-        background: #f5f5f5;
-        color: #777;
+        background: #f7fafc;
+        color: #4a5568;
+        border-color: var(--border-color);
       }
 
-      .badge {
+      /* 有意差バッジ */
+      .badge-custom {
         display: inline-block;
         font-size: 10px;
-        padding: 2px 6px;
-        border-radius: 10px;
-        margin-left: 4px;
-        vertical-align: middle;
-        font-weight: normal;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 20px;
       }
       .badge-significant {
-        background: #c8e6c9;
-        color: #1b5e20;
+        background: #c6f6d5;
+        color: #22543d;
       }
       .badge-marginal {
-        background: #fff9c4;
-        color: #f57f17;
+        background: #feebc8;
+        color: #744210;
       }
       .badge-none {
-        background: #eeeeee;
-        color: #9e9e9e;
+        background: #e2e8f0;
+        color: #4a5568;
       }
 
+      /* エラーボックス */
       .error-box {
-        background: #fff3e0;
+        background: #fff5f5;
+        border: 1px solid #fed7d7;
         border-radius: 12px;
-        padding: 20px;
-        color: #e65100;
+        padding: 24px;
+        color: #c53030;
         font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
       }
 
       /* スマホ対応 */
-      @media (max-width: 480px) {
-        body {
-          padding: 12px;
-          padding-bottom: 40px;
+      @media (max-width: 768px) {
+        .navbar {
+          margin-bottom: 24px;
         }
-        h1 {
-          font-size: 18px;
-        }
-
-        /* サマリーカードを縦積み */
         .cards {
           grid-template-columns: 1fr;
-          gap: 10px;
+          gap: 12px;
         }
-        .card {
-          display: flex;
+        .card-summary {
+          flex-direction: row;
           align-items: center;
           justify-content: space-between;
-          padding: 14px 16px;
+          padding: 16px;
         }
-        .card h2 {
-          margin-bottom: 0;
-          font-size: 13px;
+        .card-summary .value {
+          font-size: 1.35rem;
+          margin-top: 0;
         }
-        .card .value {
-          font-size: 20px;
-        }
-        .card .desc {
+        .card-summary .desc {
           display: none;
         }
-
-        /* 相関グリッドを1列に */
         .corr-grid {
           grid-template-columns: 1fr;
         }
-
         .chart-card {
-          padding: 12px;
-        }
-        .chart-card h2 {
-          font-size: 13px;
+          padding: 16px;
         }
       }
     </style>
   </head>
   <body>
-    <div class="nav"><a href="/">← トップに戻る</a></div>
-    <h1>体調 × 天気 ダッシュボード</h1>
-    <p class="subtitle">個人生活データ分析システム</p>
-
-    {% if result.get("error") %}
-    <div class="error-box">⚠️ {{ result.error }}</div>
-
-    {% else %}
-
-    <!-- サマリーカード -->
-    <div class="cards">
-      <div class="card">
-        <div>
-          <h2>分析データ数</h2>
-          <div class="desc">体調×天気が一致した日数</div>
+    <!-- ナビバー（他画面と共通） -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+      <div class="container">
+        <a class="navbar-brand" href="/">
+          <i class="bi bi-cloud-sun-fill me-2"></i>体調 × 天気
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/log"
+                ><i class="bi bi-pencil-square me-1"></i>記録</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="/dashboard"
+                ><i class="bi bi-bar-chart-line-fill me-1"></i>ダッシュボード</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/records"
+                ><i class="bi bi-folder2-open me-1"></i>管理</a
+              >
+            </li>
+          </ul>
         </div>
-        <div class="value">{{ result.data_count }} 日</div>
       </div>
-      <div class="card">
-        <div>
-          <h2>直近の気分スコア</h2>
-          <div class="desc">最新の記録</div>
-        </div>
-        <div class="value">{{ result.trend[-1].mood_score }} / 5</div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="content-container">
+      <h1>体調 × 天気 分析ダッシュボード</h1>
+      <p class="subtitle">
+        記録された生活データと、気象庁APIの履歴データを統計的に分析しています。
+      </p>
+
+      {% if result.get("error") %}
+      <div class="error-box">
+        <i class="bi bi-exclamation-octagon-fill fs-4"></i>
+        <span>{{ result.error }}</span>
       </div>
-      <div class="card">
-        <div>
-          <h2>直近の気圧</h2>
-          <div class="desc">最新の記録</div>
-        </div>
-        <div class="value">{{ result.trend[-1].pressure }} hPa</div>
-      </div>
-    </div>
 
-    <!-- トレンドグラフ（気分スコア） -->
-    <div class="chart-card">
-      <h2>気分スコアのトレンド（7日移動平均）</h2>
-      <div id="trend-mood"></div>
-    </div>
+      {% else %}
 
-    <!-- トレンドグラフ（気圧） -->
-    <div class="chart-card">
-      <h2>気圧のトレンド（7日移動平均）</h2>
-      <div id="trend-pressure"></div>
-    </div>
-
-    <!-- トレンドグラフ（気温） -->
-    <div class="chart-card">
-      <h2>気温のトレンド（7日移動平均）</h2>
-      <div id="trend-temperature"></div>
-    </div>
-
-    <!-- トレンドグラフ（湿度） -->
-    <div class="chart-card">
-      <h2>湿度のトレンド（7日移動平均）</h2>
-      <div id="trend-humidity"></div>
-    </div>
-
-    <!-- 相関ヒートマップ -->
-    <div class="chart-card">
-      <h2>相関分析ヒートマップ</h2>
-      <div id="heatmap-chart"></div>
-    </div>
-
-    <!-- 相関サマリー -->
-    <div class="chart-card">
-      <h2>気分スコアと天気の関係</h2>
-      <div class="corr-grid">
-        {% for item in result.correlations if item.health == "mood_score" %} {%
-        set cls = "positive" if item.r > 0.1 else ("negative" if item.r < -0.1
-        else "neutral") %}
-        <div class="corr-item {{ cls }}">
-          <div class="label">
-            {{ { "temperature": "気温", "humidity": "湿度", "pressure": "気圧",
-            "pressure_change_prev": "前日の気圧変化", "pressure_range_prev":
-            "前日の気圧変化幅", "temperature_change_prev": "前日の気温変化",
-            "humidity_change_prev": "前日の湿度変化" }[item.weather] }}{% if
-            item.significant_05 %}
-            <span class="badge badge-significant">統計的に有意 ✓</span>
-            {% elif item.significant_10 %}
-            <span class="badge badge-marginal">参考値</span>
-            {% else %}
-            <span class="badge badge-none">データ不足</span>
-            {% endif %}
+      <!-- サマリーカード -->
+      <div class="cards">
+        <div class="card-summary">
+          <div>
+            <h2>分析データ数</h2>
+            <div class="desc">体調×天気が揃った整合日数</div>
           </div>
-          <div class="r-value">r = {{ item.r }}</div>
-          <div class="summary">{{ item.summary }}</div>
+          <div class="value">{{ result.data_count }} 日</div>
         </div>
-        {% endfor %}
+        <div class="card-summary">
+          <div>
+            <h2>直近の気分スコア</h2>
+            <div class="desc">最新に記録された健康度</div>
+          </div>
+          <div class="value">
+            {{ result.trend[-1].mood_score }}
+            <span style="font-size: 14px; font-weight: normal; color: #a0aec0"
+              >/ 5</span
+            >
+          </div>
+        </div>
+        <div class="card-summary">
+          <div>
+            <h2>直近の気圧</h2>
+            <div class="desc">最新の現地付近の気圧</div>
+          </div>
+          <div class="value">
+            {{ result.trend[-1].pressure }}
+            <span style="font-size: 14px; font-weight: normal; color: #a0aec0"
+              >hPa</span
+            >
+          </div>
+        </div>
       </div>
+
+      <!-- トレンドグラフ（気分スコア） -->
+      <div class="chart-card">
+        <h2>気分スコアのトレンド（7日移動平均）</h2>
+        <div id="trend-mood"></div>
+      </div>
+
+      <!-- トレンドグラフ（気圧） -->
+      <div class="chart-card">
+        <h2>気圧のトレンド（7日移動平均）</h2>
+        <div id="trend-pressure"></div>
+      </div>
+
+      <!-- トレンドグラフ（気温） -->
+      <div class="chart-card">
+        <h2>気温のトレンド（7日移動平均）</h2>
+        <div id="trend-temperature"></div>
+      </div>
+
+      <!-- トレンドグラフ（湿度） -->
+      <div class="chart-card">
+        <h2>湿度のトレンド（7日移動平均）</h2>
+        <div id="trend-humidity"></div>
+      </div>
+
+      <!-- 相関ヒートマップ -->
+      <div class="chart-card">
+        <h2>相関分析ヒートマップ</h2>
+        <div id="heatmap-chart"></div>
+      </div>
+
+      <!-- 相関サマリー -->
+      <div class="chart-card">
+        <h2>気分スコアと天気の関係</h2>
+        <div class="corr-grid">
+          {% for item in result.correlations if item.health == "mood_score" %}
+          {% set cls = "positive" if item.r > 0.1 else ("negative" if item.r <
+          -0.1 else "neutral") %}
+          <div class="corr-item {{ cls }}">
+            <div class="label">
+              <span>
+                {{ { "temperature": "気温", "humidity": "湿度", "pressure":
+                "気圧", "pressure_change_prev": "前日の気圧変化",
+                "pressure_range_prev": "前日の気圧変化幅",
+                "temperature_change_prev": "前日の気温変化",
+                "humidity_change_prev": "前日の湿度変化" }[item.weather] }}
+              </span>
+              {% if item.significant_05 %}
+              <span class="badge-custom badge-significant">有意差あり ✓</span>
+              {% elif item.significant_10 %}
+              <span class="badge-custom badge-marginal">傾向あり</span>
+              {% else %}
+              <span class="badge-custom badge-none">判定不能</span>
+              {% endif %}
+            </div>
+            <div class="r-value">r = {{ item.r }}</div>
+            <div class="summary">{{ item.summary }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- グラフ描画スクリプト（デザイン統一処理） -->
+      <script>
+        const trend = {{ result.trend | tojson }};
+
+        // スマホ判定（余白調整用）
+        const isMobile = window.innerWidth <= 480;
+        const margin = isMobile
+          ? { t: 10, r: 10, b: 40, l: 40 }
+          : { t: 10, r: 20, b: 40, l: 50 };
+
+        const commonLayout = {
+          margin,
+          legend: {
+            orientation: "h",
+            y: -0.2,
+            font: { family: "Noto Sans JP", size: 12 }
+          },
+          plot_bgcolor:  "#ffffff",
+          paper_bgcolor: "#ffffff",
+          autosize: true,
+          xaxis: {
+            gridcolor: "#f0f4f8",
+            tickfont: { family: "Noto Sans JP", size: 11, color: "#718096" }
+          },
+          yaxis: {
+            gridcolor: "#f0f4f8",
+            tickfont: { family: "Noto Sans JP", size: 11, color: "#718096" }
+          }
+        };
+
+        const commonConfig = {
+          scrollZoom: false,
+          responsive: true,
+          displayModeBar: false,  // スマホ最適化のためツールバー非表示
+        };
+
+        // 1. 気分スコア
+        Plotly.newPlot("trend-mood", [
+          {
+            x: trend.map(d => d.date),
+            y: trend.map(d => d.mood_score),
+            name: "気分スコア（実測）",
+            type: "scatter", mode: "markers",
+            marker: { color: "#cbd5e0", size: 7 }, // ソフトなグレー
+          },
+          {
+            x: trend.map(d => d.date),
+            y: trend.map(d => d.mood_7d),
+            name: "7日移動平均",
+            type: "scatter", mode: "lines",
+            line: { color: "#319795", width: 2.5 }, // ティールブルー
+          }
+        ], { ...commonLayout, yaxis: { ...commonLayout.yaxis, title: "気分", range: [0.5, 5.5] } },
+        commonConfig);
+
+        // 2. 気圧
+        Plotly.newPlot("trend-pressure", [
+          {
+            x: trend.map(d => d.date),
+            y: trend.map(d => d.pressure),
+            name: "気圧（実測）",
+            type: "scatter", mode: "markers",
+            marker: { color: "#90caf9", size: 6, opacity: 0.6 },
+          },
+          {
+            x: trend.map(d => d.date),
+            y: trend.map(d => d.pressure_7d),
+            name: "7日移動平均",
+            type: "scatter", mode: "lines",
+            line: { color: "#2b6cb0", width: 2.5 }, // ダークブルー
+          }
+        ], { ...commonLayout, yaxis: { ...commonLayout.yaxis, title: "気圧 (hPa)" } },
+        commonConfig);
+
+        // 3. 気温
+        Plotly.newPlot("trend-temperature", [
+          {
+            x: trend.map(d => d.date),
+            y: trend.map(d => d.temperature),
+            name: "気温（実測）",
+            type: "scatter", mode: "markers",
+            marker: { color: "#ffcc80", size: 6, opacity: 0.7 },
+          },
+          {
+            x: trend.map(d => d.date),
+            y: trend.map(d => d.temperature_7d),
+            name: "7日移動平均",
+            type: "scatter", mode: "lines",
+            line: { color: "#dd6b20", width: 2.5 }, // ディープオレンジ
+          }
+        ], { ...commonLayout, yaxis: { ...commonLayout.yaxis, title: "気温 (℃)" } },
+        commonConfig);
+
+        // 4. 湿度
+        Plotly.newPlot("trend-humidity", [
+          {
+            x: trend.map(d => d.date),
+            y: trend.map(d => d.humidity),
+            name: "湿度（実測）",
+            type: "scatter", mode: "markers",
+            marker: { color: "#e9d8fd", size: 6, opacity: 0.7 },
+          },
+          {
+            x: trend.map(d => d.date),
+            y: trend.map(d => d.humidity_7d),
+            name: "7日移動平均",
+            type: "scatter", mode: "lines",
+            line: { color: "#805ad5", width: 2.5 }, // パープル
+          }
+        ], { ...commonLayout, yaxis: { ...commonLayout.yaxis, title: "湿度 (%)", range: [0, 100] } },
+        commonConfig);
+
+        // 5. ヒートマップ（赤・白・緑ではなく、現代的な「チェリー・グレー・ティール」のカラーマップ）
+        const corrList = {{ result.correlations | tojson }};
+        const labelMap = {
+          mood_score:   "気分スコア",
+          sleep_hours:  "睡眠時間",
+          temperature:  "気温",
+          humidity:     "湿度",
+          pressure:     "気圧",
+          pressure_change_prev: "前日の気圧変化",
+          pressure_range_prev:  "前日の気圧変化幅",
+          temperature_change_prev: "前日の気温変化",
+          humidity_change_prev:    "前日の湿度変化"
+        };
+        const healthLabels  = [...new Set(corrList.map(d => d.health))];
+        const weatherLabels = [...new Set(corrList.map(d => d.weather))];
+        const zValues = healthLabels.map(h =>
+          weatherLabels.map(w => {
+            const item = corrList.find(d => d.health === h && d.weather === w);
+            const val = item ? item.r : null;
+            return (val === null || isNaN(val)) ? 0 : val;
+          })
+        );
+
+        Plotly.newPlot("heatmap-chart", [{
+          type:         "heatmap",
+          z:            zValues,
+          x:            weatherLabels.map(w => labelMap[w] || w),
+          y:            healthLabels.map(h => labelMap[h] || h),
+          colorscale: [
+            [0,   "#e53e3e"],  // 負の相関：コーラルレッド
+            [0.5, "#f7fafc"],  // 相関なし：クリーングレー
+            [1,   "#319795"]   // 正の相関：ティールグリーン
+          ],
+          zmin: -1, zmax: 1,
+          text:         zValues.map(row => row.map(v => v !== null ? v.toFixed(2) : "0.00")),
+          texttemplate: "%{text}",
+          showscale:    true,
+        }], {
+          ...commonLayout,
+          margin: isMobile
+            ? { t: 10, r: 10, b: 80, l: 80 }
+            : { t: 10, r: 20, b: 60, l: 100 },
+          xaxis: {
+            ...commonLayout.xaxis,
+            tickangle: isMobile ? 45 : 0
+          }
+        }, commonConfig);
+      </script>
+      {% endif %}
     </div>
 
-    <script>
-      const trend = {{ result.trend | tojson }};
-
-      // スマホ判定（グラフの余白を調整）
-      const isMobile = window.innerWidth <= 480;
-      const margin = isMobile
-        ? { t: 10, r: 10, b: 40, l: 40 }
-        : { t: 10, r: 20, b: 40, l: 50 };
-
-      const commonLayout = {
-        margin,
-        legend:        { orientation: "h", y: -0.3 },
-        plot_bgcolor:  "#fff",
-        paper_bgcolor: "#fff",
-        // グラフ幅を親要素に合わせる
-        autosize: true,
-      };
-
-      const commonConfig = {
-        // スマホでのピンチズームを許可
-        scrollZoom: false,
-        responsive: true,
-        displayModeBar: false,  // ツールバーを非表示（スマホで邪魔になる）
-      };
-
-      // 気分スコア
-      Plotly.newPlot("trend-mood", [
-        {
-          x: trend.map(d => d.date),
-          y: trend.map(d => d.mood_score),
-          name: "気分スコア（実測）",
-          type: "scatter", mode: "markers",
-          marker: { color: "#a8d5c2", size: 6 },
-        },
-        {
-          x: trend.map(d => d.date),
-          y: trend.map(d => d.mood_7d),
-          name: "7日移動平均",
-          type: "scatter", mode: "lines",
-          line: { color: "#1d9e75", width: 2 },
-        }
-      ], { ...commonLayout, yaxis: { title: "気分スコア", range: [0, 5.5] } },
-      commonConfig);
-
-      // 気圧
-      Plotly.newPlot("trend-pressure", [
-        {
-          x: trend.map(d => d.date),
-          y: trend.map(d => d.pressure),
-          name: "気圧（実測）",
-          type: "scatter", mode: "markers",
-          marker: { color: "#90caf9", size: 6 },
-        },
-        {
-          x: trend.map(d => d.date),
-          y: trend.map(d => d.pressure_7d),
-          name: "7日移動平均",
-          type: "scatter", mode: "lines",
-          line: { color: "#378add", width: 2 },
-        }
-      ], { ...commonLayout, yaxis: { title: "気圧 (hPa)" } },
-      commonConfig);
-
-      // 気温
-      Plotly.newPlot("trend-temperature", [
-        {
-          x: trend.map(d => d.date),
-          y: trend.map(d => d.temperature),
-          name: "気温（実測）",
-          type: "scatter", mode: "markers",
-          marker: { color: "#ffcc80", size: 6 },
-        },
-        {
-          x: trend.map(d => d.date),
-          y: trend.map(d => d.temperature_7d),
-          name: "7日移動平均",
-          type: "scatter", mode: "lines",
-          line: { color: "#ef6c00", width: 2 },
-        }
-      ], { ...commonLayout, yaxis: { title: "気温 (℃)" } },
-      commonConfig);
-
-      // 湿度
-      Plotly.newPlot("trend-humidity", [
-        {
-          x: trend.map(d => d.date),
-          y: trend.map(d => d.humidity),
-          name: "湿度（実測）",
-          type: "scatter", mode: "markers",
-          marker: { color: "#ce93d8", size: 6 },
-        },
-        {
-          x: trend.map(d => d.date),
-          y: trend.map(d => d.humidity_7d),
-          name: "7日移動平均",
-          type: "scatter", mode: "lines",
-          line: { color: "#7b1fa2", width: 2 },
-        }
-      ], { ...commonLayout, yaxis: { title: "湿度 (%)", range: [0, 100] } },
-      commonConfig);
-
-      // ヒートマップ
-      const corrList = {{ result.correlations | tojson }};
-      const labelMap = {
-        mood_score:  "気分スコア",
-        sleep_hours: "睡眠時間",
-        temperature: "気温",
-        humidity:    "湿度",
-        pressure:    "気圧",
-        pressure_change_prev: "前日の気圧変化",
-        pressure_range_prev: "前日の気圧変化幅",
-        temperature_change_prev: "前日の気温変化",
-        humidity_change_prev: "前日の湿度変化"
-      };
-      const healthLabels  = [...new Set(corrList.map(d => d.health))];
-      const weatherLabels = [...new Set(corrList.map(d => d.weather))];
-      const zValues = healthLabels.map(h =>
-        weatherLabels.map(w => {
-          const item = corrList.find(d => d.health === h && d.weather === w);
-          const val = item ? item.r : null;
-          return (val === null || isNaN(val)) ? 0 : val;
-        })
-      );
-
-      Plotly.newPlot("heatmap-chart", [{
-        type:         "heatmap",
-        z:            zValues,
-        x:            weatherLabels.map(w => labelMap[w] || w),
-        y:            healthLabels.map(h => labelMap[h] || h),
-        colorscale: [
-          [0,   "#c62828"],
-          [0.5, "#f5f5f5"],
-          [1,   "#2e7d32"]
-        ],
-        zmin: -1, zmax: 1,
-        text:         zValues.map(row => row.map(v => v !== null ? v.toFixed(2) : "N/A")),
-        texttemplate: "%{text}",
-        showscale:    true,
-      }], {
-        ...commonLayout,
-        margin: isMobile
-          ? { t: 10, r: 10, b: 80, l: 70 }
-          : { t: 10, r: 20, b: 60, l: 80 },
-      }, commonConfig);
-    </script>
-    {% endif %}
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
