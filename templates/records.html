@@ -478,14 +478,14 @@
               <td>
                 <button
                   class="btn-action btn-action-edit"
-                  onclick='openEdit(
-    {{ log.id }},
-    {{ log.date|tojson }},
-    {{ log.mood_score }},
-    {{ (log.sleep_hours or "")|tojson }},
-    {{ (log.symptom or "")|tojson }},
-    {{ (log.note or "")|tojson }}
-  )'
+                  onclick="openEdit(
+  {{ log.id }},
+  '{{ log.date }}',
+  {{ log.mood_score }},
+  '{{ log.sleep_hours }}',
+  '{{ log.symptom }}',
+  '{{ log.note }}'
+)"
                 >
                   <i class="bi bi-pencil-fill"></i>編集
                 </button>
@@ -535,7 +535,14 @@
         <div class="log-card-actions">
           <button
             class="btn-action btn-action-edit"
-            onclick="openEdit({{ log.id }},'{{ log.date }}',{{ log.mood_score }},'{{ log.sleep_hours or '' }}','{{ log.symptom or '' }}','{{ log.note or '' }}')"
+            onclick="openEdit(
+        {{ log.id }},
+        {{ log.date|tojson }},
+        {{ log.mood_score }},
+        {{ log.sleep_hours|tojson }},
+        {{ log.symptom|tojson }},
+        {{ log.note|tojson }}
+      )"
           >
             <i class="bi bi-pencil-fill"></i>編集
           </button>
