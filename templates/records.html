@@ -478,14 +478,13 @@
               <td>
                 <button
                   class="btn-action btn-action-edit"
-                  onclick="openEdit(
-  {{ log.id }},
-  '{{ log.date }}',
-  {{ log.mood_score }},
-  '{{ log.sleep_hours }}',
-  '{{ log.symptom }}',
-  '{{ log.note }}'
-)"
+                  data-id="{{ log.id }}"
+                  data-date="{{ log.date }}"
+                  data-mood="{{ log.mood_score }}"
+                  data-sleep="{{ log.sleep_hours }}"
+                  data-symptom="{{ log.symptom }}"
+                  data-note="{{ log.note }}"
+                  onclick="openEditFromButton(this)"
                 >
                   <i class="bi bi-pencil-fill"></i>編集
                 </button>
@@ -646,8 +645,17 @@
       </div>
     </div>
 
-    <!-- JS（既存の関数をそのまま引き継ぎ） -->
     <script>
+      function openEditFromButton(btn) {
+        const id = btn.dataset.id;
+        const date = btn.dataset.date;
+        const mood = btn.dataset.mood;
+        const sleep = btn.dataset.sleep;
+        const symptom = btn.dataset.symptom;
+        const note = btn.dataset.note;
+        openEdit(id, date, mood, sleep, symptom, note);
+      }
+
       function openEdit(id, date, mood, sleep, symptom, note) {
         document.getElementById("edit-form").action = `/records/${id}/edit`;
         document.getElementById("edit-date").value = date;

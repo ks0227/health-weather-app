@@ -1,3 +1,4 @@
+import json
 from datetime import date, timedelta
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
@@ -5,7 +6,6 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from database import db
 from models import HealthLog
 from services.analysis import run_correlation_analysis
-import json
 
 dashboard_bp = Blueprint("dashboard", __name__)
 
@@ -66,14 +66,17 @@ def log_submit():
 @dashboard_bp.route("/records")
 def records():
     logs = HealthLog.query.order_by(HealthLog.date.desc()).all()
-    logs_data = [{
-        "id":          log.id,
-        "date":        str(log.date),
-        "mood_score":  log.mood_score,
-        "sleep_hours": log.sleep_hours or "",
-        "symptom":     log.symptom or "",
-        "note":        log.note or "",
-    } for log in logs]
+    logs_data = [
+        {
+            "id": log.id,
+            "date": str(log.date),
+            "mood_score": log.mood_score,
+            "sleep_hours": log.sleep_hours or "",
+            "symptom": log.symptom or "",
+            "note": log.note or "",
+        }
+        for log in logs
+    ]
     return render_template("records.html", logs=logs_data)
 
 
