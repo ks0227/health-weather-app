@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>体調 × 天気 ダッシュボード</title>
     <!-- Plotly.js -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
     <!-- Bootstrap 5 & Icons -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
@@ -363,7 +363,7 @@
       <!-- 相関ヒートマップ -->
       <div class="chart-card">
         <h2>相関分析ヒートマップ</h2>
-        <div id="heatmap-chart"></div>
+        <div id="heatmap-chart" style="height: 300px"></div>
       </div>
 
       <!-- 相関サマリー -->
@@ -399,162 +399,176 @@
 
       <!-- グラフ描画スクリプト（デザイン統一処理） -->
       <script>
-        const trend = {{ result.trend | tojson }};
+                const trend = {{ result.trend | tojson }};
+                const corrList = {{ result.correlations | tojson }};
 
-        // スマホ判定（余白調整用）
-        const isMobile = window.innerWidth <= 480;
-        const margin = isMobile
-          ? { t: 10, r: 10, b: 40, l: 40 }
-          : { t: 10, r: 20, b: 40, l: 50 };
+                const isMobile = window.innerWidth <= 480;
+                const margin = isMobile
+                  ? { t: 10, r: 10, b: 40, l: 40 }
+                  : { t: 10, r: 20, b: 40, l: 50 };
 
-        const commonLayout = {
-          margin,
-          legend: {
-            orientation: "h",
-            y: -0.2,
-            font: { family: "Noto Sans JP", size: 12 }
-          },
-          plot_bgcolor:  "#ffffff",
-          paper_bgcolor: "#ffffff",
-          autosize: true,
-          xaxis: {
-            gridcolor: "#f0f4f8",
-            tickfont: { family: "Noto Sans JP", size: 11, color: "#718096" }
-          },
-          yaxis: {
-            gridcolor: "#f0f4f8",
-            tickfont: { family: "Noto Sans JP", size: 11, color: "#718096" }
-          }
-        };
+                const commonLayout = {
+                  margin,
+                  legend: {
+                    orientation: "h",
+                    y: -0.2,
+                    font: { family: "Noto Sans JP", size: 12 },
+                  },
+                  plot_bgcolor:  "#ffffff",
+                  paper_bgcolor: "#ffffff",
+                  autosize: true,
+                  xaxis: {
+                    gridcolor: "#f0f4f8",
+                    tickfont: { family: "Noto Sans JP", size: 11, color: "#718096" },
+                  },
+                  yaxis: {
+                    gridcolor: "#f0f4f8",
+                    tickfont: { family: "Noto Sans JP", size: 11, color: "#718096" },
+                  },
+                };
 
-        const commonConfig = {
-          scrollZoom: false,
-          responsive: true,
-          displayModeBar: false,  // スマホ最適化のためツールバー非表示
-        };
+                const commonConfig = {
+                  scrollZoom: false,
+                  responsive: true,
+                  displayModeBar: false,
+                };
 
-        // 1. 気分スコア
-        Plotly.newPlot("trend-mood", [
-          {
-            x: trend.map(d => d.date),
-            y: trend.map(d => d.mood_score),
-            name: "気分スコア（実測）",
-            type: "scatter", mode: "markers",
-            marker: { color: "#cbd5e0", size: 7 }, // ソフトなグレー
-          },
-          {
-            x: trend.map(d => d.date),
-            y: trend.map(d => d.mood_7d),
-            name: "7日移動平均",
-            type: "scatter", mode: "lines",
-            line: { color: "#319795", width: 2.5 }, // ティールブルー
-          }
-        ], { ...commonLayout, yaxis: { ...commonLayout.yaxis, title: "気分", range: [0.5, 5.5] } },
-        commonConfig);
+                // 1. 気分スコア
+                Plotly.newPlot("trend-mood", [
+                  {
+                    x: trend.map(d => d.date),
+                    y: trend.map(d => d.mood_score),
+                    name: "気分スコア（実測）",
+                    type: "scatter", mode: "markers",
+                    marker: { color: "#cbd5e0", size: 7 },
+                  },
+                  {
+                    x: trend.map(d => d.date),
+                    y: trend.map(d => d.mood_7d),
+                    name: "7日移動平均",
+                    type: "scatter", mode: "lines",
+                    line: { color: "#319795", width: 2.5 },
+                  },
+                ], {
+                  ...commonLayout,
+                  yaxis: { ...commonLayout.yaxis, title: "気分", range: [0.5, 5.5] },
+                }, commonConfig);
 
-        // 2. 気圧
-        Plotly.newPlot("trend-pressure", [
-          {
-            x: trend.map(d => d.date),
-            y: trend.map(d => d.pressure),
-            name: "気圧（実測）",
-            type: "scatter", mode: "markers",
-            marker: { color: "#90caf9", size: 6, opacity: 0.6 },
-          },
-          {
-            x: trend.map(d => d.date),
-            y: trend.map(d => d.pressure_7d),
-            name: "7日移動平均",
-            type: "scatter", mode: "lines",
-            line: { color: "#2b6cb0", width: 2.5 }, // ダークブルー
-          }
-        ], { ...commonLayout, yaxis: { ...commonLayout.yaxis, title: "気圧 (hPa)" } },
-        commonConfig);
+                // 2. 気圧
+                Plotly.newPlot("trend-pressure", [
+                  {
+                    x: trend.map(d => d.date),
+                    y: trend.map(d => d.pressure),
+                    name: "気圧（実測）",
+                    type: "scatter", mode: "markers",
+                    marker: { color: "#90caf9", size: 6, opacity: 0.6 },
+                  },
+                  {
+                    x: trend.map(d => d.date),
+                    y: trend.map(d => d.pressure_7d),
+                    name: "7日移動平均",
+                    type: "scatter", mode: "lines",
+                    line: { color: "#2b6cb0", width: 2.5 },
+                  },
+                ], {
+                  ...commonLayout,
+                  yaxis: { ...commonLayout.yaxis, title: "気圧 (hPa)" },
+                }, commonConfig);
 
-        // 3. 気温
-        Plotly.newPlot("trend-temperature", [
-          {
-            x: trend.map(d => d.date),
-            y: trend.map(d => d.temperature),
-            name: "気温（実測）",
-            type: "scatter", mode: "markers",
-            marker: { color: "#ffcc80", size: 6, opacity: 0.7 },
-          },
-          {
-            x: trend.map(d => d.date),
-            y: trend.map(d => d.temperature_7d),
-            name: "7日移動平均",
-            type: "scatter", mode: "lines",
-            line: { color: "#dd6b20", width: 2.5 }, // ディープオレンジ
-          }
-        ], { ...commonLayout, yaxis: { ...commonLayout.yaxis, title: "気温 (℃)" } },
-        commonConfig);
+                // 3. 気温
+                Plotly.newPlot("trend-temperature", [
+                  {
+                    x: trend.map(d => d.date),
+                    y: trend.map(d => d.temperature),
+                    name: "気温（実測）",
+                    type: "scatter", mode: "markers",
+                    marker: { color: "#ffcc80", size: 6, opacity: 0.7 },
+                  },
+                  {
+                    x: trend.map(d => d.date),
+                    y: trend.map(d => d.temperature_7d),
+                    name: "7日移動平均",
+                    type: "scatter", mode: "lines",
+                    line: { color: "#dd6b20", width: 2.5 },
+                  },
+                ], {
+                  ...commonLayout,
+                  yaxis: { ...commonLayout.yaxis, title: "気温 (℃)" },
+                }, commonConfig);
 
-        // 4. 湿度
-        Plotly.newPlot("trend-humidity", [
-          {
-            x: trend.map(d => d.date),
-            y: trend.map(d => d.humidity),
-            name: "湿度（実測）",
-            type: "scatter", mode: "markers",
-            marker: { color: "#e9d8fd", size: 6, opacity: 0.7 },
-          },
-          {
-            x: trend.map(d => d.date),
-            y: trend.map(d => d.humidity_7d),
-            name: "7日移動平均",
-            type: "scatter", mode: "lines",
-            line: { color: "#805ad5", width: 2.5 }, // パープル
-          }
-        ], { ...commonLayout, yaxis: { ...commonLayout.yaxis, title: "湿度 (%)", range: [0, 100] } },
-        commonConfig);
+                // 4. 湿度
+                Plotly.newPlot("trend-humidity", [
+                  {
+                    x: trend.map(d => d.date),
+                    y: trend.map(d => d.humidity),
+                    name: "湿度（実測）",
+                    type: "scatter", mode: "markers",
+                    marker: { color: "#e9d8fd", size: 6, opacity: 0.7 },
+                  },
+                  {
+                    x: trend.map(d => d.date),
+                    y: trend.map(d => d.humidity_7d),
+                    name: "7日移動平均",
+                    type: "scatter", mode: "lines",
+                    line: { color: "#805ad5", width: 2.5 },
+                  },
+                ], {
+                  ...commonLayout,
+                  yaxis: { ...commonLayout.yaxis, title: "湿度 (%)", range: [0, 100] },
+                }, commonConfig);
 
-        // 5. ヒートマップ（赤・白・緑ではなく、現代的な「チェリー・グレー・ティール」のカラーマップ）
-        const corrList = {{ result.correlations | tojson }};
-        const labelMap = {
-          mood_score:   "気分スコア",
-          sleep_hours:  "睡眠時間",
-          temperature:  "気温",
-          humidity:     "湿度",
-          pressure:     "気圧",
-          pressure_change_prev: "前日の気圧変化",
-          pressure_range_prev:  "前日の気圧変化幅",
-          temperature_change_prev: "前日の気温変化",
-          humidity_change_prev:    "前日の湿度変化"
-        };
-        const healthLabels  = [...new Set(corrList.map(d => d.health))];
-        const weatherLabels = [...new Set(corrList.map(d => d.weather))];
-        const zValues = healthLabels.map(h =>
-          weatherLabels.map(w => {
-            const item = corrList.find(d => d.health === h && d.weather === w);
-            const val = item ? item.r : null;
-            return (val === null || isNaN(val)) ? 0 : val;
-          })
-        );
+                // 5. ヒートマップ
+                const labelMap = {
+                  mood_score:              "気分スコア",
+                  sleep_hours:             "睡眠時間",
+                  temperature:             "気温",
+                  humidity:                "湿度",
+                  pressure:                "気圧",
+                  pressure_change_prev:    "前日の気圧変化",
+                  pressure_range_prev:     "前日の気圧変化幅",
+                  temperature_change_prev: "前日の気温変化",
+                  humidity_change_prev:    "前日の湿度変化",
+                };
 
-        Plotly.newPlot("heatmap-chart", [{
+                const healthLabels  = [...new Set(corrList.map(d => d.health))];
+                const weatherLabels = [...new Set(corrList.map(d => d.weather))];
+
+                const zValues = healthLabels.map(h =>
+                  weatherLabels.map(w => {
+                    const item = corrList.find(d => d.health === h && d.weather === w);
+                    const val = item ? item.r : 0;
+                    return (val === null || val === undefined || isNaN(val)) ? 0 : val;
+                  })
+                );
+
+                const zText = zValues.map(row =>
+                  row.map(v => (v !== null && !isNaN(v)) ? v.toFixed(2) : "0.00")
+                );
+
+                Plotly.newPlot("heatmap-chart", [{
           type:         "heatmap",
           z:            zValues,
           x:            weatherLabels.map(w => labelMap[w] || w),
           y:            healthLabels.map(h => labelMap[h] || h),
           colorscale: [
-            [0,   "#e53e3e"],  // 負の相関：コーラルレッド
-            [0.5, "#f7fafc"],  // 相関なし：クリーングレー
-            [1,   "#319795"]   // 正の相関：ティールグリーン
+            [0,   "#e53e3e"],
+            [0.5, "#f7fafc"],
+            [1,   "#319795"],
           ],
           zmin: -1, zmax: 1,
-          text:         zValues.map(row => row.map(v => v !== null ? v.toFixed(2) : "0.00")),
+          text:         zText,
           texttemplate: "%{text}",
           showscale:    true,
         }], {
           ...commonLayout,
+          height: 300,  // ← 追加
           margin: isMobile
-            ? { t: 10, r: 10, b: 80, l: 80 }
-            : { t: 10, r: 20, b: 60, l: 100 },
+            ? { t: 10, r: 10, b: 120, l: 100 }
+            : { t: 10, r: 20, b: 80,  l: 120 },
           xaxis: {
             ...commonLayout.xaxis,
-            tickangle: isMobile ? 45 : 0
-          }
+            tickangle: -45,  // ← 斜めにして見やすく
+          },
         }, commonConfig);
       </script>
       {% endif %}
